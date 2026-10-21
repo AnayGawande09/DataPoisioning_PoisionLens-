@@ -1,0 +1,165 @@
+{
+  "job_id": "job_677e411e",
+  "run_id": "attack_blended_5_20261021_233232_0ad90b",
+  "preset_name": "attack_blended_5",
+  "status": "COMPLETED",
+  "current_stage": "Pipeline execution complete",
+  "stage_number": 6,
+  "total_stages": 6,
+  "start_time": 1792605752.2133296,
+  "end_time": 1792606449.8388982,
+  "elapsed_seconds": 697.63,
+  "exit_code": 0,
+  "error": null,
+  "run_dir": "D:\\workspace\\PoisonLens\\runs\\attack_blended_5_20261021_233232_0ad90b",
+  "logs": [
+    {
+      "time": "23:32:32",
+      "message": "Spawning PoisonLens pipeline process: attack_blended_5_20261021_233232_0ad90b"
+    },
+    {
+      "time": "23:32:32",
+      "message": "CLI Command: D:\\workspace\\PoisonLens\\.venv\\Scripts\\python.exe -m poisonlens.pipeline --config D:\\workspace\\PoisonLens\\runs\\attack_blended_5_20261021_233232_0ad90b\\config.yaml"
+    },
+    {
+      "time": "23:33:17",
+      "message": "======================================================================"
+    },
+    {
+      "time": "23:33:17",
+      "message": "POISONLENS PIPELINE: attack_blended_5_20261021_233232_0ad90b"
+    },
+    {
+      "time": "23:33:17",
+      "message": "Config: D:\\workspace\\PoisonLens\\runs\\attack_blended_5_20261021_233232_0ad90b\\config.yaml (Hash: 30df545b744b9b8a...)"
+    },
+    {
+      "time": "23:33:17",
+      "message": "======================================================================"
+    },
+    {
+      "time": "23:33:17",
+      "message": "[Stage 1/6] Loading CIFAR-10 data and canary partition..."
+    },
+    {
+      "time": "23:33:22",
+      "message": "[Stage 2/6] Training baseline model with dynamics tracking (epochs: 5)..."
+    },
+    {
+      "time": "23:34:30",
+      "message": "Epoch [01/05] Train Loss: 1.7438 | Train Acc: 35.55% | Test Loss: 1.6683 | Test Acc: 39.35%"
+    },
+    {
+      "time": "23:35:13",
+      "message": "Epoch [02/05] Train Loss: 1.3208 | Train Acc: 52.66% | Test Loss: 1.4281 | Test Acc: 47.75%"
+    },
+    {
+      "time": "23:35:55",
+      "message": "Epoch [03/05] Train Loss: 1.1293 | Train Acc: 59.82% | Test Loss: 1.2658 | Test Acc: 56.40%"
+    },
+    {
+      "time": "23:36:42",
+      "message": "Epoch [04/05] Train Loss: 1.0208 | Train Acc: 64.32% | Test Loss: 1.2242 | Test Acc: 54.40%"
+    },
+    {
+      "time": "23:37:30",
+      "message": "Epoch [05/05] Train Loss: 0.9071 | Train Acc: 67.86% | Test Loss: 1.6223 | Test Acc: 44.85%"
+    },
+    {
+      "time": "23:37:38",
+      "message": "Baseline Results -> Clean Acc: 44.85%, Canary Acc: 45.00%, ASR: 99.11%"
+    },
+    {
+      "time": "23:37:38",
+      "message": "[Stage 3/6] Extracting trajectory dynamics & computing suspicion scores..."
+    },
+    {
+      "time": "23:38:09",
+      "message": "Scoring completed in 30.52s (321.1 samples/sec)"
+    },
+    {
+      "time": "23:38:09",
+      "message": "[Stage 4/6] Applying 3-tier Soft Quarantine & Canary Guardrail..."
+    },
+    {
+      "time": "23:38:09",
+      "message": "Tiers: 8330 kept, 980 down-weighted, 490 quarantined"
+    },
+    {
+      "time": "23:38:09",
+      "message": "False Positives (Clean wrongly quarantined): 371 / 9310"
+    },
+    {
+      "time": "23:38:09",
+      "message": "[Stage 5/6] Retraining model from scratch with sample weights (epochs: 5)..."
+    },
+    {
+      "time": "23:38:58",
+      "message": "Epoch [01/05] Train Loss: 1.6855 | Train Acc: 34.64% | Test Loss: 1.7362 | Test Acc: 38.05%"
+    },
+    {
+      "time": "23:40:22",
+      "message": "Epoch [02/05] Train Loss: 1.3487 | Train Acc: 48.86% | Test Loss: 1.5891 | Test Acc: 42.00%"
+    },
+    {
+      "time": "23:41:27",
+      "message": "Epoch [03/05] Train Loss: 1.1759 | Train Acc: 56.21% | Test Loss: 1.4023 | Test Acc: 49.70%"
+    },
+    {
+      "time": "23:42:15",
+      "message": "Epoch [04/05] Train Loss: 1.0625 | Train Acc: 60.91% | Test Loss: 1.5181 | Test Acc: 45.00%"
+    },
+    {
+      "time": "23:43:33",
+      "message": "Epoch [05/05] Train Loss: 0.9671 | Train Acc: 64.14% | Test Loss: 1.2813 | Test Acc: 54.50%"
+    },
+    {
+      "time": "23:43:34",
+      "message": "Canary Health -> Baseline: 45.00%, Post-Mitigation: 52.00% (Delta: +7.00%)"
+    },
+    {
+      "time": "23:43:34",
+      "message": "Guardrail Decision: APPROVED (Canary health preserved (delta: +7.00% within tolerance 3.0%).)"
+    },
+    {
+      "time": "23:43:34",
+      "message": "[Stage 6/6] Final evaluation & writing hash-chained audit log..."
+    },
+    {
+      "time": "23:44:06",
+      "message": "Audit Log: runs\\attack_blended_5_20261021_233232_0ad90b\\audit_log.jsonl (9800 entries, Verification: Audit log verification SUCCESSFUL: All hash-chain links intact.)"
+    },
+    {
+      "time": "23:44:06",
+      "message": "======================================================================"
+    },
+    {
+      "time": "23:44:06",
+      "message": "PIPELINE EXECUTION COMPLETE"
+    },
+    {
+      "time": "23:44:06",
+      "message": "Total Pipeline Runtime: 649.22s"
+    },
+    {
+      "time": "23:44:06",
+      "message": "Scoring Throughput:     321.1 samples/sec"
+    },
+    {
+      "time": "23:44:06",
+      "message": "Pre-Defense -> Clean: 44.85%, ASR: 99.11%"
+    },
+    {
+      "time": "23:44:06",
+      "message": "Post-Defense -> Clean: 54.50%, ASR: 97.39%"
+    },
+    {
+      "time": "23:44:06",
+      "message": "======================================================================"
+    },
+    {
+      "time": "23:44:09",
+      "message": "Process exited successfully (code 0). Results verified."
+    }
+  ]
+}

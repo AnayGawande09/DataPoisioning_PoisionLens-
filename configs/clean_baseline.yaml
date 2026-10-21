@@ -1,0 +1,12 @@
+# PoisonLens Clean Baseline Configuration
+seed: 42
+data_root: "./data_cache"
+train_size: 10000
+test_size: 2000
+batch_size: 128
+epochs: 10
+lr: 0.001
+weight_decay: 0.0001
+device: "cpu"
+run_id: "clean_baseline"
+save_dir: "runs"

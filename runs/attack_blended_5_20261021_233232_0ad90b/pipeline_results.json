@@ -1,0 +1,32 @@
+{
+  "run_id": "attack_blended_5_20261021_233232_0ad90b",
+  "config_hash": "30df545b744b9b8ad5e69187c04997d8c22452bc57be6e88949c7f36c55646ce",
+  "total_time_seconds": 649.22,
+  "scoring_time_seconds": 30.52,
+  "scoring_throughput_samples_per_sec": 321.1,
+  "baseline_metrics": {
+    "clean_acc": "44.85%",
+    "canary_acc": "45.00%",
+    "asr": "99.11%"
+  },
+  "mitigated_metrics": {
+    "clean_acc": "54.50%",
+    "canary_acc": "52.00%",
+    "asr": "97.39%",
+    "wrongly_quarantined_clean": 371,
+    "clean_retention_rate": "96.02%",
+    "worst_class_drop": "-28.50% (Class 0)"
+  },
+  "guardrail_decision": {
+    "action": "APPROVED",
+    "reason": "Canary health preserved (delta: +7.00% within tolerance 3.0%).",
+    "baseline_canary_acc": 0.45,
+    "mitigated_canary_acc": 0.52,
+    "canary_delta": 0.07,
+    "tolerance": 0.03
+  },
+  "audit_verification": {
+    "is_valid": true,
+    "message": "Audit log verification SUCCESSFUL: All hash-chain links intact."
+  }
+}

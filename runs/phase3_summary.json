@@ -1,0 +1,110 @@
+[
+  {
+    "Attack": "Label Flip (10%)",
+    "Defense": "No Defense (Undefended)",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1": "N/A",
+    "Clean Acc": "59.65%",
+    "ASR": "72.50%"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Defense": "Loss-Threshold Filtering",
+    "Precision": "5.4%",
+    "Recall": "5.4%",
+    "F1": "0.054",
+    "Clean Acc": "45.80%",
+    "ASR": "83.50%"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Defense": "Activation Clustering",
+    "Precision": "0.0%",
+    "Recall": "0.0%",
+    "F1": "0.000",
+    "Clean Acc": "53.10%",
+    "ASR": "57.00%"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Defense": "No Defense (Undefended)",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1": "N/A",
+    "Clean Acc": "57.85%",
+    "ASR": "91.67%"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Defense": "Loss-Threshold Filtering",
+    "Precision": "0.2%",
+    "Recall": "0.2%",
+    "F1": "0.002",
+    "Clean Acc": "52.55%",
+    "ASR": "96.83%"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Defense": "Activation Clustering",
+    "Precision": "96.1%",
+    "Recall": "93.4%",
+    "F1": "0.947",
+    "Clean Acc": "59.95%",
+    "ASR": "2.44%"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Defense": "No Defense (Undefended)",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1": "N/A",
+    "Clean Acc": "56.70%",
+    "ASR": "97.39%"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Defense": "Loss-Threshold Filtering",
+    "Precision": "0.0%",
+    "Recall": "0.0%",
+    "F1": "0.000",
+    "Clean Acc": "55.30%",
+    "ASR": "97.00%"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Defense": "Activation Clustering",
+    "Precision": "0.0%",
+    "Recall": "0.0%",
+    "F1": "0.000",
+    "Clean Acc": "56.60%",
+    "ASR": "97.44%"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Defense": "No Defense (Undefended)",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1": "N/A",
+    "Clean Acc": "59.85%",
+    "ASR": "59.00%"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Defense": "Loss-Threshold Filtering",
+    "Precision": "2.2%",
+    "Recall": "2.2%",
+    "F1": "0.022",
+    "Clean Acc": "53.35%",
+    "ASR": "14.50%"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Defense": "Activation Clustering",
+    "Precision": "0.0%",
+    "Recall": "0.0%",
+    "F1": "0.000",
+    "Clean Acc": "57.55%",
+    "ASR": "54.50%"
+  }
+]

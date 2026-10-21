@@ -1,0 +1,34 @@
+{
+  "run_id": "attack_badnets_5",
+  "config_hash": "a9f83b36c58a0c0affce94df7924aed4aea47e1f2da6553beeddcc9ee88406a7",
+  "total_time_seconds": 287.06,
+  "scoring_time_seconds": 27.91,
+  "scoring_throughput_samples_per_sec": 351.1,
+  "baseline_metrics": {
+    "clean_acc": "57.85%",
+    "canary_acc": "68.00%",
+    "asr": "91.67%"
+  },
+  "mitigated_metrics": {
+    "clean_acc": "57.85%",
+    "canary_acc": "60.00%",
+    "asr": "91.67%",
+    "wrongly_quarantined_clean": 429,
+    "clean_retention_rate": "95.39%",
+    "worst_class_drop": "0.00% (Class 0)"
+  },
+  "guardrail_decision": {
+    "action": "ROLLBACK_TRIGGERED",
+    "reason": "Canary accuracy dropped by 8.00%, exceeding 3.0% tolerance.",
+    "baseline_canary_acc": 0.68,
+    "mitigated_canary_acc": 0.6,
+    "canary_delta": -0.08000000000000007,
+    "tolerance": 0.03,
+    "rolled_back_to": "runs\\attack_badnets_5\\checkpoints\\checkpoint_latest.pt",
+    "suggested_loosened_ratio": 0.025
+  },
+  "audit_verification": {
+    "is_valid": true,
+    "message": "Audit log verification SUCCESSFUL: All hash-chain links intact."
+  }
+}

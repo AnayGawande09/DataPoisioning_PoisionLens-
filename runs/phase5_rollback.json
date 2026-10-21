@@ -1,0 +1,20 @@
+[
+  {
+    "Test": "Over-Aggressive Quarantine Stress Test",
+    "Pre-Rollback Canary Acc": "38.50%",
+    "Baseline Canary Acc": "81.50%",
+    "Delta": "-43.00%",
+    "Rollback Triggered": true,
+    "Action": "ROLLBACK_TRIGGERED",
+    "Details": {
+      "action": "ROLLBACK_TRIGGERED",
+      "reason": "Canary accuracy dropped by 43.00%, exceeding 3.0% tolerance.",
+      "baseline_canary_acc": 0.815,
+      "mitigated_canary_acc": 0.385,
+      "canary_delta": -0.42999999999999994,
+      "tolerance": 0.03,
+      "rolled_back_to": "runs/clean_baseline/checkpoints/checkpoint_latest.pt",
+      "suggested_loosened_ratio": 0.175
+    }
+  }
+]

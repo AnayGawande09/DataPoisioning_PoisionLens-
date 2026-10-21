@@ -1,0 +1,122 @@
+[
+  {
+    "Attack": "Label Flip (10%)",
+    "Mitigation": "Undefended",
+    "Clean Acc": "59.65%",
+    "Canary Acc": "73.50%",
+    "ASR": "72.50%",
+    "Wrongly Quarantined": 0,
+    "Clean Retention": "100.0%",
+    "Worst Class Drop": "0.0%"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Mitigation": "Hard Deletion (All-or-Nothing)",
+    "Clean Acc": "50.85%",
+    "Canary Acc": "47.50%",
+    "ASR": "51.00%",
+    "Wrongly Quarantined": 869,
+    "Clean Retention": "90.15%",
+    "Worst Class Drop": "-32.00% (Class 1)"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Mitigation": "Soft Quarantine (3-Tier Weighted)",
+    "Clean Acc": "46.90%",
+    "Canary Acc": "45.50%",
+    "ASR": "44.50%",
+    "Wrongly Quarantined": 869,
+    "Clean Retention": "90.15%",
+    "Worst Class Drop": "-48.00% (Class 1)"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Mitigation": "Undefended",
+    "Clean Acc": "57.85%",
+    "Canary Acc": "68.00%",
+    "ASR": "91.67%",
+    "Wrongly Quarantined": 0,
+    "Clean Retention": "100.0%",
+    "Worst Class Drop": "0.0%"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Mitigation": "Hard Deletion (All-or-Nothing)",
+    "Clean Acc": "44.75%",
+    "Canary Acc": "41.50%",
+    "ASR": "82.11%",
+    "Wrongly Quarantined": 445,
+    "Clean Retention": "95.22%",
+    "Worst Class Drop": "-42.50% (Class 4)"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Mitigation": "Soft Quarantine (3-Tier Weighted)",
+    "Clean Acc": "49.35%",
+    "Canary Acc": "45.00%",
+    "ASR": "88.33%",
+    "Wrongly Quarantined": 445,
+    "Clean Retention": "95.22%",
+    "Worst Class Drop": "-44.00% (Class 4)"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Mitigation": "Undefended",
+    "Clean Acc": "56.70%",
+    "Canary Acc": "64.00%",
+    "ASR": "97.39%",
+    "Wrongly Quarantined": 0,
+    "Clean Retention": "100.0%",
+    "Worst Class Drop": "0.0%"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Mitigation": "Hard Deletion (All-or-Nothing)",
+    "Clean Acc": "50.05%",
+    "Canary Acc": "48.50%",
+    "ASR": "98.44%",
+    "Wrongly Quarantined": 466,
+    "Clean Retention": "94.99%",
+    "Worst Class Drop": "-32.00% (Class 3)"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Mitigation": "Soft Quarantine (3-Tier Weighted)",
+    "Clean Acc": "55.10%",
+    "Canary Acc": "56.00%",
+    "ASR": "96.56%",
+    "Wrongly Quarantined": 466,
+    "Clean Retention": "94.99%",
+    "Worst Class Drop": "-25.00% (Class 9)"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Mitigation": "Undefended",
+    "Clean Acc": "59.85%",
+    "Canary Acc": "73.00%",
+    "ASR": "59.00%",
+    "Wrongly Quarantined": 0,
+    "Clean Retention": "100.0%",
+    "Worst Class Drop": "0.0%"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Mitigation": "Hard Deletion (All-or-Nothing)",
+    "Clean Acc": "54.80%",
+    "Canary Acc": "51.50%",
+    "ASR": "35.50%",
+    "Wrongly Quarantined": 395,
+    "Clean Retention": "95.76%",
+    "Worst Class Drop": "-31.00% (Class 5)"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Mitigation": "Soft Quarantine (3-Tier Weighted)",
+    "Clean Acc": "58.60%",
+    "Canary Acc": "59.50%",
+    "ASR": "33.50%",
+    "Wrongly Quarantined": 395,
+    "Clean Retention": "95.76%",
+    "Worst Class Drop": "-32.50% (Class 5)"
+  }
+]

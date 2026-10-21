@@ -1,0 +1,15 @@
+attack: label_flip
+batch_size: 128
+data_root: ./data_cache
+device: cpu
+epochs: 10
+lr: 0.001
+poison_rate: 0.1
+run_id: attack_labelflip_10
+save_dir: runs
+seed: 42
+source_class: 3
+target_class: 5
+test_size: 2000
+train_size: 10000
+weight_decay: 0.0001

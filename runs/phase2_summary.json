@@ -1,0 +1,32 @@
+[
+  {
+    "Attack": "Clean Baseline",
+    "Poison %": "0.0%",
+    "Clean Acc": "62.00%",
+    "ASR": "N/A (LF:16.5%, BN:4.8%, BL:3.5%)"
+  },
+  {
+    "Attack": "label_flip",
+    "Poison %": "5.0%",
+    "Clean Acc": "59.85%",
+    "ASR": "59.00%"
+  },
+  {
+    "Attack": "label_flip",
+    "Poison %": "10.0%",
+    "Clean Acc": "59.65%",
+    "ASR": "72.50%"
+  },
+  {
+    "Attack": "badnets",
+    "Poison %": "5.0%",
+    "Clean Acc": "57.85%",
+    "ASR": "91.67%"
+  },
+  {
+    "Attack": "blended",
+    "Poison %": "5.0%",
+    "Clean Acc": "56.70%",
+    "ASR": "97.39%"
+  }
+]

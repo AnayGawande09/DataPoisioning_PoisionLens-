@@ -1,0 +1,185 @@
+{
+  "job_id": "job_d7917516",
+  "run_id": "attack_badnets_5_20261021_224550_155c05",
+  "preset_name": "attack_badnets_5",
+  "status": "COMPLETED",
+  "current_stage": "Pipeline execution complete",
+  "stage_number": 6,
+  "total_stages": 6,
+  "start_time": 1792602950.0279949,
+  "end_time": 1792604293.6055672,
+  "elapsed_seconds": 1343.58,
+  "exit_code": 0,
+  "error": null,
+  "run_dir": "D:\\workspace\\PoisonLens\\runs\\attack_badnets_5_20261021_224550_155c05",
+  "logs": [
+    {
+      "time": "22:45:50",
+      "message": "Spawning PoisonLens pipeline process: attack_badnets_5_20261021_224550_155c05"
+    },
+    {
+      "time": "22:45:50",
+      "message": "CLI Command: D:\\workspace\\PoisonLens\\.venv\\Scripts\\python.exe -m poisonlens.pipeline --config D:\\workspace\\PoisonLens\\runs\\attack_badnets_5_20261021_224550_155c05\\config.yaml"
+    },
+    {
+      "time": "22:46:41",
+      "message": "======================================================================"
+    },
+    {
+      "time": "22:46:41",
+      "message": "POISONLENS PIPELINE: attack_badnets_5_20261021_224550_155c05"
+    },
+    {
+      "time": "22:46:41",
+      "message": "Config: D:\\workspace\\PoisonLens\\runs\\attack_badnets_5_20261021_224550_155c05\\config.yaml (Hash: 5f7f667302cb0db1...)"
+    },
+    {
+      "time": "22:46:41",
+      "message": "======================================================================"
+    },
+    {
+      "time": "22:46:41",
+      "message": "[Stage 1/6] Loading CIFAR-10 data and canary partition..."
+    },
+    {
+      "time": "22:46:46",
+      "message": "[Stage 2/6] Training baseline model with dynamics tracking (epochs: 10)..."
+    },
+    {
+      "time": "22:48:10",
+      "message": "Epoch [01/10] Train Loss: 1.7662 | Train Acc: 34.77% | Test Loss: 1.5572 | Test Acc: 44.05%"
+    },
+    {
+      "time": "22:49:33",
+      "message": "Epoch [02/10] Train Loss: 1.4056 | Train Acc: 49.71% | Test Loss: 1.4022 | Test Acc: 48.45%"
+    },
+    {
+      "time": "22:50:50",
+      "message": "Epoch [03/10] Train Loss: 1.1816 | Train Acc: 58.79% | Test Loss: 1.3651 | Test Acc: 51.15%"
+    },
+    {
+      "time": "22:52:10",
+      "message": "Epoch [04/10] Train Loss: 1.0613 | Train Acc: 63.11% | Test Loss: 1.2618 | Test Acc: 53.95%"
+    },
+    {
+      "time": "22:53:30",
+      "message": "Epoch [05/10] Train Loss: 0.9460 | Train Acc: 67.27% | Test Loss: 1.5981 | Test Acc: 48.90%"
+    },
+    {
+      "time": "22:54:50",
+      "message": "Epoch [06/10] Train Loss: 0.8574 | Train Acc: 70.22% | Test Loss: 1.5763 | Test Acc: 50.25%"
+    },
+    {
+      "time": "22:56:12",
+      "message": "Epoch [07/10] Train Loss: 0.7736 | Train Acc: 73.23% | Test Loss: 1.2924 | Test Acc: 56.10%"
+    },
+    {
+      "time": "22:57:33",
+      "message": "Epoch [08/10] Train Loss: 0.6763 | Train Acc: 77.07% | Test Loss: 1.1874 | Test Acc: 58.25%"
+    },
+    {
+      "time": "22:59:24",
+      "message": "Epoch [09/10] Train Loss: 0.5927 | Train Acc: 80.18% | Test Loss: 1.2938 | Test Acc: 56.60%"
+    },
+    {
+      "time": "23:00:43",
+      "message": "Epoch [10/10] Train Loss: 0.5004 | Train Acc: 83.51% | Test Loss: 1.3241 | Test Acc: 57.60%"
+    },
+    {
+      "time": "23:00:58",
+      "message": "Baseline Results -> Clean Acc: 57.60%, Canary Acc: 53.50%, ASR: 91.17%"
+    },
+    {
+      "time": "23:00:58",
+      "message": "[Stage 3/6] Extracting trajectory dynamics & computing suspicion scores..."
+    },
+    {
+      "time": "23:01:48",
+      "message": "Scoring completed in 49.98s (196.1 samples/sec)"
+    },
+    {
+      "time": "23:01:48",
+      "message": "[Stage 4/6] Applying 3-tier Soft Quarantine & Canary Guardrail..."
+    },
+    {
+      "time": "23:01:48",
+      "message": "Tiers: 8330 kept, 980 down-weighted, 490 quarantined"
+    },
+    {
+      "time": "23:01:48",
+      "message": "False Positives (Clean wrongly quarantined): 350 / 9310"
+    },
+    {
+      "time": "23:01:48",
+      "message": "[Stage 5/6] Retraining model from scratch with sample weights (epochs: 5)..."
+    },
+    {
+      "time": "23:03:07",
+      "message": "Epoch [01/05] Train Loss: 1.6502 | Train Acc: 34.52% | Test Loss: 2.6504 | Test Acc: 23.75%"
+    },
+    {
+      "time": "23:04:24",
+      "message": "Epoch [02/05] Train Loss: 1.2980 | Train Acc: 46.15% | Test Loss: 1.5120 | Test Acc: 44.60%"
+    },
+    {
+      "time": "23:05:40",
+      "message": "Epoch [03/05] Train Loss: 1.1347 | Train Acc: 51.98% | Test Loss: 1.2983 | Test Acc: 53.50%"
+    },
+    {
+      "time": "23:06:31",
+      "message": "Epoch [04/05] Train Loss: 1.0040 | Train Acc: 56.67% | Test Loss: 1.2946 | Test Acc: 54.65%"
+    },
+    {
+      "time": "23:07:38",
+      "message": "Epoch [05/05] Train Loss: 0.8876 | Train Acc: 61.67% | Test Loss: 1.3872 | Test Acc: 50.75%"
+    },
+    {
+      "time": "23:07:39",
+      "message": "Canary Health -> Baseline: 53.50%, Post-Mitigation: 47.50% (Delta: -6.00%)"
+    },
+    {
+      "time": "23:07:39",
+      "message": "Guardrail Decision: ROLLBACK_TRIGGERED (Canary accuracy dropped by 6.00%, exceeding 3.0% tolerance.)"
+    },
+    {
+      "time": "23:07:39",
+      "message": "[Stage 6/6] Final evaluation & writing hash-chained audit log..."
+    },
+    {
+      "time": "23:08:11",
+      "message": "Audit Log: runs\\attack_badnets_5_20261021_224550_155c05\\audit_log.jsonl (9800 entries, Verification: Audit log verification SUCCESSFUL: All hash-chain links intact.)"
+    },
+    {
+      "time": "23:08:11",
+      "message": "======================================================================"
+    },
+    {
+      "time": "23:08:11",
+      "message": "PIPELINE EXECUTION COMPLETE"
+    },
+    {
+      "time": "23:08:11",
+      "message": "Total Pipeline Runtime: 1290.04s"
+    },
+    {
+      "time": "23:08:11",
+      "message": "Scoring Throughput:     196.1 samples/sec"
+    },
+    {
+      "time": "23:08:11",
+      "message": "Pre-Defense -> Clean: 57.60%, ASR: 91.17%"
+    },
+    {
+      "time": "23:08:11",
+      "message": "Post-Defense -> Clean: 57.60%, ASR: 91.17%"
+    },
+    {
+      "time": "23:08:11",
+      "message": "======================================================================"
+    },
+    {
+      "time": "23:08:13",
+      "message": "Process exited successfully (code 0). Results verified."
+    }
+  ]
+}

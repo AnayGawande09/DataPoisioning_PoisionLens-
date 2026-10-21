@@ -1,0 +1,37 @@
+# Datasets & Large Archives
+data_cache/
+*.tar.gz
+*.tar
+*.zip
+*.pt
+*.pth
+
+# Python & Virtual Environments
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Frontend Node & Build
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Execution logs
+*.log

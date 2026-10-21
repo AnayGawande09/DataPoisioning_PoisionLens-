@@ -1,0 +1,170 @@
+[
+  {
+    "Attack": "Label Flip (10%)",
+    "Configuration": "Full (All 5 Features)",
+    "Precision": "12.1%",
+    "Recall": "12.1%",
+    "F1": "0.121"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Configuration": "w/o first_correct_epoch",
+    "Precision": "14.3%",
+    "Recall": "14.3%",
+    "F1": "0.143"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Configuration": "w/o forgetting_count",
+    "Precision": "11.6%",
+    "Recall": "11.6%",
+    "F1": "0.116"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Configuration": "w/o loss_variance",
+    "Precision": "12.5%",
+    "Recall": "12.5%",
+    "F1": "0.125"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Configuration": "w/o early_grad_norm",
+    "Precision": "14.4%",
+    "Recall": "14.4%",
+    "F1": "0.144"
+  },
+  {
+    "Attack": "Label Flip (10%)",
+    "Configuration": "w/o knn_disagreement",
+    "Precision": "10.2%",
+    "Recall": "10.2%",
+    "F1": "0.102"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Configuration": "Full (All 5 Features)",
+    "Precision": "27.6%",
+    "Recall": "27.6%",
+    "F1": "0.276"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Configuration": "w/o first_correct_epoch",
+    "Precision": "27.8%",
+    "Recall": "27.8%",
+    "F1": "0.278"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Configuration": "w/o forgetting_count",
+    "Precision": "27.6%",
+    "Recall": "27.6%",
+    "F1": "0.276"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Configuration": "w/o loss_variance",
+    "Precision": "4.8%",
+    "Recall": "4.8%",
+    "F1": "0.048"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Configuration": "w/o early_grad_norm",
+    "Precision": "28.8%",
+    "Recall": "28.8%",
+    "F1": "0.288"
+  },
+  {
+    "Attack": "BadNets Backdoor (5%)",
+    "Configuration": "w/o knn_disagreement",
+    "Precision": "26.2%",
+    "Recall": "26.2%",
+    "F1": "0.262"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Configuration": "Full (All 5 Features)",
+    "Precision": "2.4%",
+    "Recall": "2.4%",
+    "F1": "0.024"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Configuration": "w/o first_correct_epoch",
+    "Precision": "2.4%",
+    "Recall": "2.4%",
+    "F1": "0.024"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Configuration": "w/o forgetting_count",
+    "Precision": "2.4%",
+    "Recall": "2.4%",
+    "F1": "0.024"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Configuration": "w/o loss_variance",
+    "Precision": "0.0%",
+    "Recall": "0.0%",
+    "F1": "0.000"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Configuration": "w/o early_grad_norm",
+    "Precision": "2.4%",
+    "Recall": "2.4%",
+    "F1": "0.024"
+  },
+  {
+    "Attack": "Blended Backdoor (5%)",
+    "Configuration": "w/o knn_disagreement",
+    "Precision": "2.4%",
+    "Recall": "2.4%",
+    "F1": "0.024"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Configuration": "Full (All 5 Features)",
+    "Precision": "6.2%",
+    "Recall": "6.2%",
+    "F1": "0.062"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Configuration": "w/o first_correct_epoch",
+    "Precision": "7.4%",
+    "Recall": "7.4%",
+    "F1": "0.074"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Configuration": "w/o forgetting_count",
+    "Precision": "6.2%",
+    "Recall": "6.2%",
+    "F1": "0.062"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Configuration": "w/o loss_variance",
+    "Precision": "6.2%",
+    "Recall": "6.2%",
+    "F1": "0.062"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Configuration": "w/o early_grad_norm",
+    "Precision": "6.2%",
+    "Recall": "6.2%",
+    "F1": "0.062"
+  },
+  {
+    "Attack": "Label Flip (5%)",
+    "Configuration": "w/o knn_disagreement",
+    "Precision": "10.8%",
+    "Recall": "10.8%",
+    "F1": "0.108"
+  }
+]
