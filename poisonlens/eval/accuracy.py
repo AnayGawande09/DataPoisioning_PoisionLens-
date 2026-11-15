@@ -1,7 +1,5 @@
 """Clean accuracy evaluation for any loader yielding (x, y, sample_id)."""
 
-from typing import Tuple
-
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -12,7 +10,7 @@ def evaluate_clean_accuracy(
     model: torch.nn.Module,
     test_loader: DataLoader,
     device: torch.device = torch.device("cpu"),
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """Calculate clean accuracy and average cross-entropy loss."""
     model.eval()
     total_correct = 0

@@ -7,14 +7,14 @@ Dataset-specific loaders (e.g. the CIFAR-10 benchmark loader) live in
 
 from __future__ import annotations
 
-from typing import Optional, Sequence, Tuple
+from collections.abc import Sequence
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-DEFAULT_MEAN: Tuple[float, float, float] = (0.5, 0.5, 0.5)
-DEFAULT_STD: Tuple[float, float, float] = (0.5, 0.5, 0.5)
+DEFAULT_MEAN: tuple[float, float, float] = (0.5, 0.5, 0.5)
+DEFAULT_STD: tuple[float, float, float] = (0.5, 0.5, 0.5)
 
 
 class ImageArrayDataset(Dataset):
@@ -29,7 +29,7 @@ class ImageArrayDataset(Dataset):
         images: np.ndarray,
         targets: Sequence[int],
         sample_ids: Sequence[int],
-        source_indices: Optional[Sequence[int]] = None,
+        source_indices: Sequence[int] | None = None,
         mean: Sequence[float] = DEFAULT_MEAN,
         std: Sequence[float] = DEFAULT_STD,
     ):
@@ -53,5 +53,5 @@ class ImageArrayDataset(Dataset):
     def __len__(self) -> int:
         return len(self.images)
 
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int, int]:
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, int, int]:
         return self.tensors[idx], int(self.targets[idx]), int(self.sample_ids[idx])

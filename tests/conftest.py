@@ -1,7 +1,5 @@
 """Shared synthetic fixtures. Tests never download datasets."""
 
-from typing import Tuple
-
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -9,7 +7,7 @@ from torch.utils.data import DataLoader
 from poisonlens.data.image_dataset import ImageArrayDataset
 
 
-def synthetic_images(n: int, seed: int, num_classes: int = 10, size: int = 32) -> Tuple[np.ndarray, np.ndarray]:
+def synthetic_images(n: int, seed: int, num_classes: int = 10, size: int = 32) -> tuple[np.ndarray, np.ndarray]:
     """Class-dependent uint8 images (learnable signal plus noise) and balanced labels."""
     rng = np.random.RandomState(seed)
     labels = np.arange(n) % num_classes
@@ -22,7 +20,7 @@ def synthetic_images(n: int, seed: int, num_classes: int = 10, size: int = 32) -
 
 def synthetic_loaders(
     train_size: int, test_size: int, seed: int, batch_size: int = 64
-) -> Tuple[DataLoader, DataLoader, ImageArrayDataset, ImageArrayDataset]:
+) -> tuple[DataLoader, DataLoader, ImageArrayDataset, ImageArrayDataset]:
     """Deterministic train/test loaders over synthetic images (mirrors the v1 CIFAR loader API)."""
     x_tr, y_tr = synthetic_images(train_size, seed)
     x_te, y_te = synthetic_images(test_size, seed + 1000)

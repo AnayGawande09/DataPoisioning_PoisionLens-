@@ -7,7 +7,7 @@ endpoints that were removed.
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,7 +33,7 @@ app.add_middleware(
 
 
 @app.get("/api/health", summary="Service health")
-def health() -> Dict[str, Any]:
+def health() -> dict[str, Any]:
     """Report that the API is up and which version is running."""
     import torch
 

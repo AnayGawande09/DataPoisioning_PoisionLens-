@@ -1,0 +1,8 @@
+# Quick profile: first look, large datasets (spec 4.2: 6 epochs, 1 seed, 32 px).
+profile: quick
+probe:
+  epochs: 6
+  seeds: [0]
+  image_resolution: 32
+  min_epochs: 4
+  time_budget_seconds: 300

@@ -1,0 +1,10 @@
+# Standard profile (default). ScanConfig() defaults already equal this profile;
+# the probe values are repeated here so the profile table is readable in one place.
+# Every key is validated; unknown keys are errors. See poisonlens/core/config.py.
+profile: standard
+probe:
+  epochs: 10
+  seeds: [0, 1, 2]
+  image_resolution: 32
+  min_epochs: 4
+  time_budget_seconds: 900

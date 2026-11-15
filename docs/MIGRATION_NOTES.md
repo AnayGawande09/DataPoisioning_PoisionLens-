@@ -19,6 +19,31 @@ This file records how the real repository maps onto the plan, which was written 
 - Backend: `python -m uvicorn backend.main:app` starts; `GET /api/health` → 200; `GET /api/presets` → 404.
 - Frontend: `npm ci && npm run build && npm run lint` pass.
 
+## Phase 1 — core schemas, config, storage layout
+
+New package `poisonlens/core/` (no v1 equivalent):
+
+| Module | Contents |
+| :--- | :--- |
+| `errors.py` | `PoisonLensError` base; `ConfigError`, `UnsafeFileError(check_id, location)`, `UnsupportedFormatError(detected_kind)`, `LimitExceededError(limit, limit_value, observed)`; plus `PathSafetyError` (not in the plan list; used by `paths.py`, subclasses `ValueError`). |
+| `schemas.py` | `Modality`, `Severity` (with `.rank`), `Tier` (`.weight` = 1.0 / 0.20 / 0.0), `StageName` (spec stage ids `ingest … seal`), `StageStatus`, `ScanStatus`, `Verdict`, `Location`, `Finding`, `ColumnProfile`, `LabelCandidate`, `SplitInfo`, `Capabilities`, `DatasetProfile`, `StageResult`, `ScanState`. All models forbid unknown fields. |
+| `config.py` | `ScanConfig` (= Standard profile) with sections `limits.{upload,archive,worker,parse}`, `security`, `quality`, `features`, `probe`, `detect`, `risk`, `tiers`, `canary`, `export`; `load_scan_config(profile, overrides, config_dir)`. |
+| `paths.py` | `ScanPaths(scan_id)`: `root, upload, sandbox, canonical, features, dynamics, results, audit, export, events_file, state_file`, `ensure()`, `resolve(rel)`. |
+| `events.py` | `EventKind`, `ProgressEvent`, `EventLog` (append-only `events.jsonl`; event id = line number for SSE `Last-Event-ID`). |
+
+Decisions worth knowing:
+
+- **Provisional values.** The spec names many thresholds but leaves some open: fusion family weights, vote threshold, risk-score weights, verdict thresholds, most resource limits, time budgets. These are set to stated starting points and marked `provisional` in `docs/CONFIG.md`, which is generated from the code (`scripts/gen_config_doc.py`; a test fails if it is stale). Fusion weights are equal (0.8 each) so nothing is biased before Phase 12. Risk weights: contamination 0.35, agreement 0.20, label-noise excess 0.15, trigger strength 0.15, security severity 0.15. Verdict thresholds: Suspicious ≥ 30, Likely Poisoned ≥ 60.
+- **Profiles.** Profile names are `quick | standard | deep`. Plan file names map as `quick → scan_quick.yaml`, `standard → scan_default.yaml`, `deep → scan_deep.yaml`. YAML files are partial overrides of `ScanConfig()`; `scan_default.yaml` must equal `ScanConfig()` (tested). Overrides cannot change the profile.
+- **Rotation divisibility.** Default profiles give exact chunk rotation (6·2/4, 10·2/4, 16·2/4 are integers). The config does not reject other epoch counts; Phase 6 distributes a remainder evenly, as the plan allows.
+- **Data dir.** `$POISONLENS_DATA_DIR`, else `<repo>/data` (gitignored as `/data/`). Config dir: `$POISONLENS_CONFIG_DIR`, else `<repo>/configs`.
+- **Path safety.** `ScanPaths.resolve` rejects `..`, absolute/UNC/drive paths, drive-relative `C:x`, NTFS `:stream`, NUL, and percent-encoded (incl. double-encoded) variants, then re-checks containment after `resolve()` so symlinks pointing outside are refused. The symlink test is skipped on Windows without Developer Mode.
+- **Event log writer.** Single writer per scan (the pipeline process); each event is one `write` + `fsync`. Readers skip a trailing partial line. Process-safe locking for multiple writers is the ledger's job in Phase 9.
+
+Tooling added: `ruff` (lint + format) and `mypy` (pydantic plugin) configured in `pyproject.toml`, run on new code (`poisonlens/core`, `poisonlens/data`, `backend`, new tests, `scripts`). The v1 modules and `poisonlens/bench` are excluded until they are rewritten.
+
+Gate 1: `python -c "from poisonlens.core.config import ScanConfig; print(ScanConfig())"` works; `tests/unit/test_core_*.py` + `test_config_doc.py` cover spec defaults, profiles, unknown keys, invalid values, traversal and schema round-trips. Full suite: **229 passed, 1 skipped**.
+
 ## Module map (keep / move / rewrite / delete)
 
 ### `poisonlens/`
