@@ -8,13 +8,13 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 
 
 @torch.no_grad()
 def extract_all_penultimate_features(
     model: torch.nn.Module,
-    dataset: CIFAR10Subset,
+    dataset: ImageArrayDataset,
     batch_size: int = 128,
     device: torch.device = torch.device("cpu"),
 ) -> np.ndarray:
@@ -43,7 +43,7 @@ def extract_all_penultimate_features(
 
 def detect_by_activation_clustering(
     model: torch.nn.Module,
-    dataset: CIFAR10Subset,
+    dataset: ImageArrayDataset,
     num_classes: int = 10,
     pca_components: int = 10,
     silhouette_threshold: float = 0.12,

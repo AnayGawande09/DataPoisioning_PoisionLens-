@@ -17,7 +17,7 @@ from poisonlens.detect.trajectory_scorer import (
     compute_suspicion_scores,
     detect_by_trajectory_fingerprint,
 )
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 from poisonlens.models.resnet import create_model
 
 
@@ -124,7 +124,7 @@ def test_end_to_end_detector():
     N = 50
     images = np.zeros((N, 32, 32, 3), dtype=np.uint8)
     targets = np.random.randint(0, 10, size=N)
-    sub = CIFAR10Subset(images, targets, list(range(N)), list(range(N)))
+    sub = ImageArrayDataset(images, targets, list(range(N)), list(range(N)))
     
     early_model = create_model(10)
     converged_model = create_model(10)

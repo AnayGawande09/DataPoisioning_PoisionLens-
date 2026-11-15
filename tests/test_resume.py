@@ -8,7 +8,7 @@ import torch
 import numpy as np
 
 from poisonlens.utils import set_seed, ensure_dir
-from poisonlens.data.cifar import get_cifar10_loaders
+from tests.conftest import synthetic_loaders
 from poisonlens.models.resnet import create_model
 from poisonlens.training.trainer import PoisonLensTrainer
 
@@ -16,20 +16,13 @@ from poisonlens.training.trainer import PoisonLensTrainer
 def test_resume_parity(tmp_path):
     """Verify that training with checkpoint and resume matches uninterrupted training bit-for-bit."""
     seed = 2026
-    data_root = "./data_cache"
 
     # Part 1: Uninterrupted run for 4 epochs
     uninterrupted_dir = str(tmp_path / "uninterrupted")
     ensure_dir(uninterrupted_dir)
 
     set_seed(seed)
-    train_loader1, test_loader1, train_sub1, _, _ = get_cifar10_loaders(
-        data_root=data_root,
-        train_size=1000,
-        test_size=200,
-        batch_size=64,
-        seed=seed,
-    )
+    train_loader1, test_loader1, train_sub1, _ = synthetic_loaders(train_size=1000, test_size=200, seed=seed, batch_size=64)
 
     config1 = {
         "seed": seed,
@@ -58,13 +51,7 @@ def test_resume_parity(tmp_path):
     ensure_dir(resumed_dir)
 
     set_seed(seed)
-    train_loader2, test_loader2, train_sub2, _, _ = get_cifar10_loaders(
-        data_root=data_root,
-        train_size=1000,
-        test_size=200,
-        batch_size=64,
-        seed=seed,
-    )
+    train_loader2, test_loader2, train_sub2, _ = synthetic_loaders(train_size=1000, test_size=200, seed=seed, batch_size=64)
 
     config2 = {
         "seed": seed,

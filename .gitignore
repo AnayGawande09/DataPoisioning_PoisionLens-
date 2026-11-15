@@ -35,3 +35,9 @@ Thumbs.db
 
 # Execution logs
 *.log
+
+# v1 benchmark harness output (poisonlens.bench.v1)
+/runs/
+
+# v2 scan data
+/data/

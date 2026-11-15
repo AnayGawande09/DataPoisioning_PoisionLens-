@@ -16,7 +16,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from sklearn.neighbors import NearestNeighbors
 
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 
 
 def extract_first_correct_epoch(correct_history: np.ndarray) -> np.ndarray:
@@ -89,7 +89,7 @@ def extract_loss_dynamics(loss_history: np.ndarray) -> Tuple[np.ndarray, np.ndar
 
 def extract_early_gradient_norm(
     model: nn.Module,
-    dataset: CIFAR10Subset,
+    dataset: ImageArrayDataset,
     device: torch.device = torch.device("cpu"),
     batch_size: int = 128,
 ) -> np.ndarray:
@@ -192,7 +192,7 @@ def extract_all_trajectory_features(
     correct_history: np.ndarray,
     early_model: nn.Module,
     converged_model: nn.Module,
-    dataset: CIFAR10Subset,
+    dataset: ImageArrayDataset,
     device: torch.device = torch.device("cpu"),
     k_neighbors: int = 15,
 ) -> Dict[str, np.ndarray]:

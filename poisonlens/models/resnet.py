@@ -1,4 +1,4 @@
-"""Compact ResNet architecture optimized for CPU training on CIFAR-10 with feature extraction support."""
+"""Compact ResNet for 32x32 (or larger) RGB images, with penultimate-feature extraction."""
 
 from typing import Tuple, Union
 import torch
@@ -36,7 +36,7 @@ class ResidualBlock(nn.Module):
 
 
 class SmallResNet(nn.Module):
-    """Small ResNet model (~280k params) fast enough for sub-minute CPU execution on CIFAR-10."""
+    """Small ResNet model (~280k params) fast enough for CPU probe training on small images."""
 
     def __init__(self, num_classes: int = 10):
         super().__init__()

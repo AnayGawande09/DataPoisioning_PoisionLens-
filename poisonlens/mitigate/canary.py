@@ -7,8 +7,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from poisonlens.data.cifar import CIFAR10Subset
-from poisonlens.eval.asr import evaluate_clean_accuracy
+from poisonlens.data.image_dataset import ImageArrayDataset
+from poisonlens.eval.accuracy import evaluate_clean_accuracy
 
 
 class CanaryGuard:
@@ -18,7 +18,7 @@ class CanaryGuard:
 
     def __init__(
         self,
-        canary_dataset: CIFAR10Subset,
+        canary_dataset: ImageArrayDataset,
         tolerance: float = 0.03,  # Max allowable canary accuracy drop (3.0%)
         device: torch.device = torch.device("cpu"),
         batch_size: int = 64,

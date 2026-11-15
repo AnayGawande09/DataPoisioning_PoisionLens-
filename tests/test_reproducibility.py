@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import torch
 
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 from poisonlens.models.resnet import create_model
 from poisonlens.detect.trajectory_scorer import detect_by_trajectory_fingerprint
 
@@ -14,7 +14,7 @@ def test_scoring_reproducibility():
     N = 100
     images = np.zeros((N, 32, 32, 3), dtype=np.uint8)
     targets = np.random.randint(0, 10, size=N)
-    sub = CIFAR10Subset(images, targets, list(range(N)), list(range(N)))
+    sub = ImageArrayDataset(images, targets, list(range(N)), list(range(N)))
     
     losses = np.random.uniform(0.1, 2.0, size=(5, N)).astype(np.float32)
     correct = np.random.choice([True, False], size=(5, N))

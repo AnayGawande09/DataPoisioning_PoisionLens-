@@ -1,68 +1,35 @@
-"""Security and validation utilities for PoisonLens API."""
+"""Security and validation utilities for the PoisonLens API.
+
+Identifier regex and path-containment guards. The v2 artifact allowlist is
+added with the scan API (Phase 10); see docs/MIGRATION_NOTES.md for what was
+removed from v1.
+"""
+
+from __future__ import annotations
 
 import re
-import os
+from pathlib import Path
+
 from fastapi import HTTPException
 
-# Safe regex pattern for run IDs and identifiers
+# Safe identifier pattern (v2 tightens this to 8-64 chars for scan ids in Phase 1).
 SAFE_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_\-]+$")
 
-# Strict allowlist of preset names
-ALLOWED_PRESETS = {
-    "clean_baseline",
-    "attack_badnets_5",
-    "attack_blended_5",
-    "attack_labelflip_5",
-    "attack_labelflip_10",
-}
 
-# Strict allowlist of downloadable artifacts to prevent unauthorized file access
-ALLOWED_ARTIFACTS = {
-    "pipeline_results.json",
-    "audit_log.jsonl",
-    "tampered_audit_log.jsonl",
-    "config.yaml",
-    "run_info.json",
-    "results.json",
-}
-
-
-def validate_run_id(run_id: str) -> str:
-    """Validate run_id against safe character pattern to prevent path traversal."""
-    if not run_id or not SAFE_ID_PATTERN.match(run_id):
+def validate_identifier(value: str, kind: str = "id") -> str:
+    """Reject identifiers that are empty or contain anything but ``[A-Za-z0-9_-]``."""
+    if not value or not SAFE_ID_PATTERN.match(value):
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid run_id '{run_id}'. Run IDs must contain only alphanumeric characters, underscores, and hyphens.",
+            detail=f"Invalid {kind}. Only letters, digits, underscores and hyphens are allowed.",
         )
-    if ".." in run_id or "/" in run_id or "\\" in run_id:
-        raise HTTPException(status_code=400, detail="Path traversal sequences are strictly forbidden.")
-    return run_id
+    return value
 
 
-def validate_preset_name(preset_name: str) -> str:
-    """Validate preset_name against strict allowlist."""
-    if preset_name not in ALLOWED_PRESETS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Preset '{preset_name}' is not in the allowlist of supported configurations. Allowed: {sorted(list(ALLOWED_PRESETS))}",
-        )
-    return preset_name
-
-
-def validate_artifact_name(artifact_name: str) -> str:
-    """Validate artifact filename against allowed artifact list."""
-    if not artifact_name or artifact_name not in ALLOWED_ARTIFACTS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Artifact '{artifact_name}' is not accessible. Allowed artifacts: {sorted(list(ALLOWED_ARTIFACTS))}",
-        )
-    return artifact_name
-
-
-def safe_resolve_path(base_dir: str, target_name: str) -> str:
-    """Safely resolve path ensuring it remains strictly inside base_dir."""
-    resolved_base = os.path.abspath(base_dir)
-    target_path = os.path.abspath(os.path.join(resolved_base, target_name))
-    if not target_path.startswith(resolved_base):
+def safe_resolve_path(base_dir: str | Path, target_name: str) -> Path:
+    """Resolve ``target_name`` under ``base_dir`` and refuse anything that escapes it."""
+    base = Path(base_dir).resolve()
+    target = (base / target_name).resolve()
+    if target != base and base not in target.parents:
         raise HTTPException(status_code=400, detail="Path traversal attempt detected.")
-    return target_path
+    return target

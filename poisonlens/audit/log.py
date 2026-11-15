@@ -5,7 +5,7 @@ import os
 import json
 import time
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 GENESIS_HASH = "0" * 64
@@ -52,7 +52,7 @@ class HashChainedAuditLog:
         extra_metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Append a decision record to the hash-chained audit log."""
-        timestamp = datetime.utcnow().isoformat() + "Z"
+        timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
         
         entry_payload = {
             "index": self.current_index,

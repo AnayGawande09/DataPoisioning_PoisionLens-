@@ -8,7 +8,7 @@ import torch
 import numpy as np
 
 from poisonlens.utils import set_seed, ensure_dir
-from poisonlens.data.cifar import get_cifar10_loaders
+from tests.conftest import synthetic_loaders
 from poisonlens.models.resnet import create_model
 from poisonlens.training.trainer import PoisonLensTrainer
 
@@ -18,13 +18,7 @@ def train_short_run(seed: int, run_dir: str, epochs: int = 2) -> Tuple[float, Di
     set_seed(seed)
     ensure_dir(run_dir)
 
-    train_loader, test_loader, train_subset, test_subset, _ = get_cifar10_loaders(
-        data_root="./data_cache",
-        train_size=1000,
-        test_size=200,
-        batch_size=64,
-        seed=seed,
-    )
+    train_loader, test_loader, train_subset, test_subset = synthetic_loaders(train_size=1000, test_size=200, seed=seed, batch_size=64)
 
     config = {
         "seed": seed,

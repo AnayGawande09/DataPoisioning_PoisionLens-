@@ -5,13 +5,13 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 
 
 @torch.no_grad()
 def compute_sample_losses(
     model: torch.nn.Module,
-    dataset: CIFAR10Subset,
+    dataset: ImageArrayDataset,
     batch_size: int = 128,
     device: torch.device = torch.device("cpu"),
 ) -> np.ndarray:
@@ -36,7 +36,7 @@ def compute_sample_losses(
 
 def detect_by_loss_threshold(
     model: torch.nn.Module,
-    dataset: CIFAR10Subset,
+    dataset: ImageArrayDataset,
     drop_ratio: float = 0.05,
     losses: Optional[np.ndarray] = None,
     device: torch.device = torch.device("cpu"),

@@ -7,6 +7,10 @@
 [![Security](https://img.shields.io/badge/audit-SHA--256%20Hash%20Chained-orange.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
+> **v2 rebuild in progress (branch `v2-upload-first`).** PoisonLens is being rebuilt so you can upload your own dataset in any common format.
+> The v1 CIFAR-10 experiment pipeline, presets and Judge Demo Mode have been removed from the product. Attack code and the v1 pipeline are kept as a dev-only benchmark harness in `poisonlens/bench/`.
+> Sections 1-3 and 8 below describe **v1 benchmark results** (archived under `bench_artifacts/v1_runs/` and `docs/v1/`); they are not claims about v2. See `docs/MIGRATION_NOTES.md`.
+
 > **"If an attacker can manipulate your training data, they don't need to break your encryption or steal your keys—they have already programmed your model's decisions."**
 
 PoisonLens is an end-to-end cybersecurity research and operations framework engineered to detect, mitigate, and audit **training-data poisoning attacks and neural backdoors** in deep learning pipelines. Operating without expensive auxiliary neural networks, PoisonLens analyzes per-sample **training dynamics over time**, applies **3-tier soft quarantine**, safeguards deployment with an automated **clean canary guardrail**, and seals all decisions in an **immutable SHA-256 hash-chained cryptographic ledger**.
@@ -139,78 +143,32 @@ Every value below was empirically measured on a fixed CIFAR-10 subset (10,000 tr
 
 ---
 
-## 4. System Architecture & Project Layout
+## 4. Project Layout (v2 Phase 0)
 
 ```
 PoisonLens/
-├── configs/                     # Supported YAML experiment presets
-│   ├── clean_baseline.yaml      # Control group (0% poison)
-│   ├── attack_badnets_5.yaml    # 3x3 white square patch backdoor (5%)
-│   ├── attack_blended_5.yaml    # Subtle alpha-blend noise backdoor (5%)
-│   ├── attack_labelflip_5.yaml  # Targeted label flip (5%, class 3 -> 5)
-│   └── attack_labelflip_10.yaml # Targeted label flip (10%, class 3 -> 5)
-├── poisonlens/                  # Core ML Research Framework
-│   ├── data/                    # CIFAR-10 tensor loaders & provenance tracking
-│   ├── models/                  # SmallResNet (~308k params) with penultimate hook
-│   ├── training/                # PoisonLensTrainer with per-sample dynamics logging
-│   ├── attacks/                 # Label flip, BadNets patch, and Blended backdoors
-│   ├── detect/                  # Loss filter, Activation clustering, Trajectory scoring
-│   ├── mitigate/                # 3-tier Soft Quarantine and CanaryGuard rollback
-│   ├── eval/                    # ASR and per-class collateral impact metrics
-│   ├── audit/                   # SHA-256 hash-chained JSONL audit ledger & CLI
-│   └── pipeline/                # Unified CLI orchestrator
-├── backend/                     # FastAPI Asynchronous REST Service
-│   ├── main.py                  # API routes, CORS, Pydantic models
-│   ├── runner.py                # Asynchronous subprocess manager with unbuffered log streaming
-│   ├── services.py              # Dynamic NPZ parser, artifact loaders, audit verifier
-│   └── security.py              # Allowlist validator & path traversal guards
-├── frontend/                    # React 19 + TypeScript + Vite Web Dashboard
-│   ├── src/                     # Simplified UI components, plain-English guides, charts
-│   └── package.json             # Frontend dependencies
-├── runs/                        # Experiment checkpoints, dynamics, logs, and artifacts
-├── tests/                       # 40 automated pytest unit & integration tests
-│   ├── test_attacks.py          # Attack injection correctness
-│   ├── test_detect.py           # Dynamics scoring & baseline filters
-│   ├── test_mitigate.py         # 3-tier weights, soft quarantine & canary guardrail
-│   ├── test_audit.py            # SHA-256 chaining & tamper detection
-│   └── test_backend_api.py      # 15 FastAPI endpoint integration tests
-├── pyproject.toml               # Python package configuration
-└── README.md                    # Project documentation
+├── poisonlens/
+│   ├── data/          # Generic in-memory image dataset (ImageArrayDataset)
+│   ├── models/        # SmallResNet with penultimate-feature hook
+│   ├── training/      # PoisonLensTrainer with per-sample dynamics logging
+│   ├── detect/        # Trajectory signals + MAD scoring, loss filter, activation clustering
+│   ├── mitigate/      # 3-tier soft quarantine and CanaryGuard rollback
+│   ├── eval/          # Clean and per-class accuracy
+│   ├── audit/         # SHA-256 hash-chained JSONL ledger + verify CLI
+│   ├── pipeline/      # v2 scan pipeline (rebuilt in Phase 9)
+│   └── bench/         # DEV ONLY: attacks, CIFAR-10 loader, v1 pipeline + scripts + configs
+├── backend/           # FastAPI app (health only until Phase 10) + security guards
+├── frontend/          # React 19 + TypeScript + Vite app shell
+├── bench_artifacts/   # Archived v1 run outputs (reference for Phase 12 comparisons)
+├── docs/              # MIGRATION_NOTES.md, archived v1 technical report
+└── tests/             # pytest suite (tests/bench/ covers the bench harness)
 ```
 
 ---
 
-## 5. Web Dashboard & FastAPI Backend
+## 5. Backend API
 
-PoisonLens includes a **FastAPI backend** and a **React 19 + TypeScript dashboard** designed with plain-English guides and sublabels for judges and non-technical stakeholders.
-
-### Dual Operating Modes
-1. **Judge Demo Mode (Offline Fixtures)**: Zero-latency interactive replay of all master benchmarks, sample training dynamics, canary rollbacks, and audit verification without requiring CPU/GPU compute during evaluation.
-2. **Live Backend API**: Asynchronously runs `python -m poisonlens.pipeline`, streaming real-time stage progress, training loss curves, and terminal logs.
-
-### Complete REST API Specification
-
-| Endpoint | Method | Description |
-| :--- | :--- | :--- |
-| `/api/health` | GET | Check API status and PyTorch CPU/GPU availability |
-| `/api/presets` | GET | List validated YAML experiment configurations |
-| `/api/runs` | GET | List completed experiment runs and metadata |
-| `/api/runs/start` | POST | Trigger background pipeline run (`allowlist` protected) |
-| `/api/runs/{run_id}/status` | GET | Polling endpoint for run progress, stage, and exit code |
-| `/api/runs/{run_id}/results` | GET | Genuine metrics from `pipeline_results.json` |
-| `/api/runs/{run_id}/samples` | GET | Paginated sample audit entries with filter support |
-| `/api/runs/{run_id}/samples/{id}` | GET | Per-sample 10-epoch dynamics from `training_dynamics.npz` |
-| `/api/runs/{run_id}/audit` | GET | Cryptographic log summary and recent entry preview |
-| `/api/runs/{run_id}/audit/verify` | POST | Real SHA-256 hash-chain verification |
-| `/api/runs/{run_id}/audit/simulate-tamper` | POST | Demonstration endpoint creating broken block #10 |
-| `/api/runs/{run_id}/artifacts` | GET | List permitted artifacts with file sizes |
-| `/api/runs/{run_id}/artifacts/{file}` | GET | Secure artifact download with path traversal prevention |
-| `/api/benchmarks` | GET | Comparative benchmark matrix across all attack vectors |
-
-### Security Controls Implemented
-- **Preset Allowlist**: Only validated preset names are accepted (`clean_baseline`, `attack_badnets_5`, `attack_blended_5`, `attack_labelflip_5`, `attack_labelflip_10`).
-- **Path Traversal Protection**: Run IDs are strictly regex-validated (`^[a-zA-Z0-9_\-]+$`) and artifact paths are resolved against strict boundary roots.
-- **Dataset Support Notice**: PoisonLens is calibrated specifically for CIFAR-10 ($32 \times 32 \times 3$). Custom datasets cannot be uploaded arbitrarily without implementing a custom tensor adapter.
+The v1 run/preset API was removed. The upload-first scan API (see `POISONLENS_V2_SPEC.md` section 6) is built in Phase 10. Currently served: `GET /api/health`.
 
 ---
 
@@ -227,19 +185,15 @@ python -m venv .venv
 # (On Linux / macOS: source .venv/bin/activate)
 
 # Install dependencies
-pip install torch torchvision numpy scikit-learn matplotlib pyyaml pytest fastapi uvicorn httpx
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install numpy scikit-learn matplotlib pyyaml pytest fastapi "uvicorn[standard]" httpx pydantic python-multipart
 pip install -e . --no-deps
 ```
 
-### Step 2: Run All 40 Automated Tests
+### Step 2: Run the Tests
 ```powershell
-# Run ML research pipeline unit tests (25 tests)
-pytest tests/test_audit.py tests/test_mitigation.py tests/test_attacks.py -v
-
-# Run backend API integration tests (15 tests)
-pytest tests/test_backend_api.py -v
+python -m pytest -q
 ```
-*(All 40 tests verify determinism, resume parity, attacks, defenses, trajectory scoring, 3-tier mitigation, canary rollback, audit logging, tamper detection, and API security in under 2 minutes.)*
 
 ---
 
@@ -265,17 +219,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 ---
 
-## 7. How to Demonstrate to Judges (2-Minute Walkthrough)
-
-1. **Dashboard & Plain-English Overview**: Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/). Notice that each tab features a plain-English subtitle and a collapsible **"How This Tab Works"** guide explaining the core concepts in non-technical terms.
-2. **Master Scoreboard**: Click **Model Benchmarks** (`Scoreboard`). Review the head-to-head comparison table showing why traditional hard deletion drops accuracy by -13%, while PoisonLens recovers +3.80% to +5.05% clean accuracy via 3-Tier Soft Quarantine.
-3. **Safety Canary Rollback**: Click **Results & Guardrail** (`Defense Scorecard`). Observe the Canary Guardrail banner showing how an 8% drop on 200 secret clean images triggered an automatic safety rollback, protecting the production system.
-4. **Forensic Image Inspection**: Click **Sample Explorer** (`Inspect Images`). Click on poisoned sample `#2984` (Frog labeled as Truck) to inspect its erratic 10-epoch training loss curve compared to steady clean images.
-5. **Cryptographic Tamper Proof**: Click **Cryptographic Audit** (`Tamper-Proof Log`). Click **"Verify Audit Log"** to prove the SHA-256 chain is intact. Then click **"Simulate Tampering"** to watch block #10 immediately fail cryptographic verification, demonstrating mathematical non-repudiation.
-
----
-
-## 8. Honest Security Insights & Limitations
+## 7. Honest Security Insights & Limitations (v1 benchmark)
 
 1. **Semantic Label Corruption**: Conventional clustering fails completely ($0.000\text{ F}_1$) on label flipping because images do not separate geometrically. PoisonLens achieves **$0.121\text{ F}_1$** by tracking forgetting events, cutting attack transfer from $72.5\%$ down to $44.5\%$.
 2. **Mitigating Clean Accuracy Collapse**: Hard deletion discards difficult clean examples, dropping clean accuracy by up to $-13.1\%$. PoisonLens's 3-Tier Soft Quarantine recovers **$+3.80\%\text{ to }+5.05\%$** clean accuracy by downweighting borderline samples ($w=0.20$) rather than deleting them.
@@ -283,7 +227,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 ---
 
-## 9. License & Research Citation
+## 8. License & Research Citation
 
 PoisonLens is released under the **MIT License**.
 

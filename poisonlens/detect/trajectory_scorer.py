@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 
 from poisonlens.detect.dynamics_features import extract_all_trajectory_features
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 
 
 FEATURE_NAMES = [
@@ -146,7 +146,7 @@ def detect_by_trajectory_fingerprint(
     correct_history: np.ndarray,
     early_model: Any,
     converged_model: Any,
-    dataset: CIFAR10Subset,
+    dataset: ImageArrayDataset,
     drop_ratio: float = 0.05,
     val_indices: Optional[np.ndarray] = None,
     val_labels: Optional[np.ndarray] = None,
@@ -163,7 +163,7 @@ def detect_by_trajectory_fingerprint(
         correct_history: (num_epochs, N) boolean array.
         early_model: Checkpoint model from epoch 1.
         converged_model: Checkpoint model from final epoch.
-        dataset: CIFAR10Subset training dataset.
+        dataset: ImageArrayDataset training dataset.
         drop_ratio: Fraction of top suspicious samples to flag as poison.
         val_indices: Optional validation indices for weight tuning.
         val_labels: Optional validation labels.

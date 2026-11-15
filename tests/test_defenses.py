@@ -8,7 +8,7 @@ from poisonlens.detect.metrics import compute_detection_metrics
 from poisonlens.detect.loss_filter import detect_by_loss_threshold
 from poisonlens.detect.activation_clustering import detect_by_activation_clustering
 from poisonlens.models.resnet import create_model
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 
 
 def test_detection_metrics():
@@ -30,7 +30,7 @@ def test_loss_filter():
     N = 100
     images = np.zeros((N, 32, 32, 3), dtype=np.uint8)
     targets = np.random.randint(0, 10, size=N)
-    sub = CIFAR10Subset(images, targets, list(range(N)), list(range(N)))
+    sub = ImageArrayDataset(images, targets, list(range(N)), list(range(N)))
 
     # Synthetic losses
     losses = np.linspace(0.1, 5.0, N)
@@ -54,7 +54,7 @@ def test_activation_clustering():
     images = np.zeros((N, 32, 32, 3), dtype=np.uint8)
     # 50 in class 0, 50 in class 1
     targets = np.array([0] * 50 + [1] * 50)
-    sub = CIFAR10Subset(images, targets, list(range(N)), list(range(N)))
+    sub = ImageArrayDataset(images, targets, list(range(N)), list(range(N)))
 
     # Create synthetic bimodal features for class 0 (40 clean samples around [0,0...], 10 poison around [10,10...])
     features = np.zeros((N, 128), dtype=np.float32)

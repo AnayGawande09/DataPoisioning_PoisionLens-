@@ -17,7 +17,7 @@ from poisonlens.eval.per_class import (
     evaluate_per_class_accuracy,
     compute_per_class_impact,
 )
-from poisonlens.data.cifar import CIFAR10Subset
+from poisonlens.data.image_dataset import ImageArrayDataset
 from poisonlens.models.resnet import create_model
 
 
@@ -80,7 +80,7 @@ def test_canary_guard_health_and_rollback(tmp_path):
     N = 20
     images = np.zeros((N, 32, 32, 3), dtype=np.uint8)
     targets = np.zeros(N, dtype=np.int64)
-    canary_sub = CIFAR10Subset(images, targets, list(range(N)), list(range(N)))
+    canary_sub = ImageArrayDataset(images, targets, list(range(N)), list(range(N)))
     
     guard = CanaryGuard(canary_sub, tolerance=0.03)
     
