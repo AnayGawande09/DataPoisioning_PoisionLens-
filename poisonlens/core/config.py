@@ -61,6 +61,10 @@ class ArchiveLimits(_Strict):
     max_entries: int = Field(200_000, gt=0, description="provisional: F02 entry-count cap")
     max_entry_bytes: int = Field(2 * GiB, gt=0, description="provisional: per-entry uncompressed cap")
     max_total_bytes: int = Field(20 * GiB, gt=0, description="provisional: total uncompressed cap")
+    ratio_check_min_bytes: int = Field(
+        1 * MiB, gt=0, description="provisional: ratio cap enforced once a member exceeds this size"
+    )
+    max_member_path_length: int = Field(1024, gt=0, description="provisional: F04 sanitized path length cap")
 
     @model_validator(mode="after")
     def _entry_le_total(self) -> ArchiveLimits:

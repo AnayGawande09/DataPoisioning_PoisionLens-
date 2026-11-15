@@ -44,6 +44,48 @@ Tooling added: `ruff` (lint + format) and `mypy` (pydantic plugin) configured in
 
 Gate 1: `python -c "from poisonlens.core.config import ScanConfig; print(ScanConfig())"` works; `tests/unit/test_core_*.py` + `test_config_doc.py` cover spec defaults, profiles, unknown keys, invalid values, traversal and schema round-trips. Full suite: **229 passed, 1 skipped**.
 
+## Phase 2 — secure ingestion (S0)
+
+New code (no v1 equivalent):
+
+| Module | Contents |
+| :--- | :--- |
+| `ingest/upload.py` | `UploadManager`: `init(filename, size, sha256?)`, `put_part(id, n, bytes, sha256?)`, `status(id)`, `abort(id)`, `complete(id)`. Parts are **0-based**. Sessions live in `data/uploads/<32-hex id>/`. `complete` creates `scan_<16 hex>` and writes `upload/original.<ext>` (generated name, mode 0600, `O_EXCL`) plus `upload/meta.json`. |
+| `ingest/sniff.py` | `sniff(path, claimed_name) -> SniffResult{kind, confidence, claimed_ext, mismatch, detail, polyglot, macro_enabled}` and `f01_findings()`. Distinguishes xlsx/xlsm/docx/pptx/ods/jar/npz/PyTorch-zip from plain ZIP. Flags appended-ZIP polyglots. |
+| `ingest/names.py` | *(not in the plan's file list)* shared name analysis: F03 unsafe (absolute, drive, UNC, `..`) vs F04 hygiene (NUL, control, bidi, Windows-reserved/forbidden characters, trailing dot/space, over-long), plus the case-insensitive collision key. |
+| `ingest/limits.py` | Upload size and disk-quota checks; `ArchiveBudget` enforcing entries, per-member bytes, total bytes and compression ratio on streamed bytes. |
+| `ingest/archive.py` | `safe_extract()` / `SafeExtractor` for zip, tar, tar.gz/bz2/xz, single-file gz/bz2/xz, 7z (`py7zr`, optional). Plan-then-extract; nested archives expanded to `<member>.extracted/` up to depth 3 with a shared budget. |
+| `ingest/worker.py` | `run_isolated("module:function", args, WorkerLimits, workdir)`: spawn child, result via JSON file, psutil watchdog (RSS / CPU / wall clock) on every OS, `RLIMIT_CPU`/`RLIMIT_AS` on POSIX, best-effort network namespace on Linux, audit hook blocking sockets, subprocess, `os.system`/`exec`/`spawn`. |
+| `ingest/jobs.py` | `ingest_job`: the S0 step run inside the worker (sniff, F01, extraction, `results/ingest_report.json`, `results/findings_ingest.json`, ledger). |
+| `security/catalogue.py` | *(early, Phase 4 builds on it)* metadata for all 25 checks F01–F14 / C01–C11 from spec section 3, and `make_finding()`. |
+| `audit/ledger.py` | Ledger stub in the final entry format `{i, ts, type, payload, prev, hash}` with `hash = SHA256(prev ‖ canonical_json({i, ts, type, payload}))`. Phase 9 adds locking, verify, Merkle root, signature. The v1 `audit/log.py` is unchanged. |
+| `core/paths.py::os_path` | Windows extended-length (`\\?\`) path helper. |
+
+Decisions worth knowing:
+
+- **Halting.** Any F03 in an archive rejects the whole upload before anything is written (`security.halt_on_critical_file`). Any F02 breach also stops extraction and removes what was written, because a bomb cannot be partially trusted. Executable content (PE/ELF/Mach-O/JAR) found by sniffing halts too. In each case the ledger gets `SECURITY_FINDING` entries and `FILE_REJECTED`.
+- **Findings are aggregated** per (check, reason) with a count and up to 20 examples, so a hostile archive with 100k bad names yields a handful of findings, not 100k.
+- **Ratio cap is overall, not just per member.** Output may not exceed 100× the compressed container size (once past 1 MiB). For the 1 GiB gzip-of-zeros test (~4.5 MiB compressed) extraction stops after ~450 MiB of output: correct by the spec's 100:1 rule, but those bytes do hit the disk briefly before cleanup. Lowering `ratio_check_min_bytes` or the ratio tightens this.
+- **NUL in ZIP names.** Python's `zipfile` silently truncates names at NUL. The extractor analyzes `ZipInfo.orig_filename` so the ambiguity is reported (F04) and the member skipped.
+- **Windows long paths.** Extracted names can exceed `MAX_PATH`; all extraction I/O goes through `os_path()`. Phase 3 adapters must do the same when reading sandbox files.
+- **Upload names** are stricter than archive member names: anything with NUL, control or bidi characters, or path separators, is rejected outright (`UnsafeFileError`, F04). Other oddities are harmless because the bytes are stored under a generated name.
+- **`SCAN_STARTED` is written at upload completion** (dataset sha256, size, tool versions). The scan config is not known until the user confirms it (Phase 10 `configure`); Phase 9 decides how to record it.
+- **Two config additions** (both provisional, in `docs/CONFIG.md`): `limits.archive.ratio_check_min_bytes` (1 MiB) and `limits.archive.max_member_path_length` (1024).
+- **New dependencies:** `psutil` (required), `py7zr` (optional; 7z uploads are rejected with a clear message without it).
+
+Gate 2 evidence (`tests/unit/test_ingest_*.py`, `tests/integration/test_ingest_flow.py`; every hostile file is generated in-test):
+
+| Gate item | Result |
+| :--- | :--- |
+| Zip-slip rejected with F03 critical | ✔ five path variants + backslash variant + nested zip-slip; nothing written outside or inside the sandbox |
+| 1 GB-of-zeros zip bomb stops at the cap without exhausting memory | ✔ zip (~1 MiB) and gzip variants; RSS growth asserted < 200 MiB; a separate test proves the streaming total cap works even with ratio checks off |
+| Symlink rejected; nesting depth 4 rejected | ✔ zip symlink, tar symlink/hardlink/char-device/FIFO; depth 3 extracts, depth 4 halts with F02 |
+| `data.csv` with a PE header → F01 | ✔ high severity; also ELF/Mach-O/JAR, pickle-as-csv, docx-as-xlsx, polyglot PNG+ZIP |
+| Watchdog kills runaway jobs within the wall-clock limit on Windows **and Linux** | ✔ **Windows** (wall clock 3 s job killed at ~3.1 s; CPU-time and memory kills too). ✖ **Linux not verified**: no Linux, WSL or Docker on the dev machine. The tests accept either the watchdog kill or the POSIX rlimit outcome, but have never run on Linux. |
+| Resumable upload: out of order, duplicate part, wrong size, wrong final hash | ✔ plus part-hash mismatch, conflicting duplicate, tampered part on disk, missing parts, resume via `status()`, quota and size limits |
+
+Full suite: **399 passed, 1 skipped** (symlink-escape test in `test_core_paths.py`, needs Windows Developer Mode).
+
 ## Module map (keep / move / rewrite / delete)
 
 ### `poisonlens/`

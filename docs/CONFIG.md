@@ -24,6 +24,8 @@ override the `probe.*` values listed in spec section 4.2. Unknown keys in any YA
 | `limits.archive.max_entries` | `200000` | provisional | F02 entry-count cap |
 | `limits.archive.max_entry_bytes` | `2147483648` | provisional | per-entry uncompressed cap |
 | `limits.archive.max_total_bytes` | `21474836480` | provisional | total uncompressed cap |
+| `limits.archive.ratio_check_min_bytes` | `1048576` | provisional | ratio cap enforced once a member exceeds this size |
+| `limits.archive.max_member_path_length` | `1024` | provisional | F04 sanitized path length cap |
 | `limits.worker.max_memory_bytes` | `4294967296` | provisional | RSS cap, watchdog kills above |
 | `limits.worker.wall_clock_seconds` | `1800.0` | provisional | per parse job |
 | `limits.worker.cpu_seconds` | `1800.0` | provisional | per parse job |

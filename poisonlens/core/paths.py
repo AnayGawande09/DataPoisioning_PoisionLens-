@@ -159,3 +159,20 @@ class ScanPaths:
 
     def __repr__(self) -> str:
         return f"ScanPaths({self.scan_id!r}, root={str(self.root)!r})"
+
+
+def os_path(path: Path | str) -> str:
+    r"""Filesystem path string safe for long paths.
+
+    On Windows, absolute paths of 240+ characters get the ``\?\`` extended-length prefix so
+    they work regardless of the system's 260-character ``MAX_PATH`` setting. Use it for any
+    file operation on extracted members, whose names can be long. Elsewhere it is ``str(path)``.
+    """
+    s = str(path)
+    prefix = "\\\\?\\"  # the four characters \\?\
+    if os.name == "nt" and len(s) >= 240 and not s.startswith(prefix):
+        s = os.path.abspath(s)
+        if s.startswith("\\\\"):  # UNC \\server\share -> \\?\UNC\server\share
+            return prefix + "UNC\\" + s[2:]
+        return prefix + s
+    return s

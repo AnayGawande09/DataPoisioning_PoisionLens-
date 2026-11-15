@@ -49,3 +49,11 @@ class LimitExceededError(PoisonLensError):
 
 class PathSafetyError(PoisonLensError, ValueError):
     """An identifier or relative path would escape its sandbox (traversal, absolute path, bad id)."""
+
+
+class UploadStateError(PoisonLensError):
+    """An upload operation is not valid in the upload's current state (unknown id, missing parts, done)."""
+
+
+class IntegrityError(PoisonLensError):
+    """Bytes do not match what was declared (part size, part hash, final hash, conflicting re-upload)."""

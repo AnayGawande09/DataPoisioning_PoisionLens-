@@ -105,6 +105,32 @@ def test_resolve_rejects_symlink_escape(tmp_path):
         sp.resolve("results/link/secret.txt")
 
 
+@pytest.mark.skipif(os.name != "nt", reason="extended-length prefix is Windows-only")
+def test_os_path_long_windows_paths():
+    from poisonlens.core.paths import os_path
+
+    prefix = "\\\\?\\"
+    assert len(prefix) == 4
+    long_local = "C:\\" + "a" * 250
+    assert os_path(long_local) == prefix + long_local
+    long_unc = "\\\\srv\\share\\" + "a" * 240
+    assert os_path(long_unc) == prefix + "UNC\\srv\\share\\" + "a" * 240
+    assert os_path(prefix + long_local) == prefix + long_local  # idempotent
+    assert os_path("C:\\short") == "C:\\short"
+
+
+def test_os_path_long_file_roundtrip(tmp_path):
+    from poisonlens.core.paths import os_path
+
+    deep = tmp_path.joinpath(*(["d" * 50] * 6))  # > 260 characters in total
+    os.makedirs(os_path(deep), exist_ok=True)
+    target = deep / ("f" * 100 + ".txt")
+    with open(os_path(target), "wb") as fh:
+        fh.write(b"ok")
+    with open(os_path(target), "rb") as fh:
+        assert fh.read() == b"ok"
+
+
 def test_env_data_dir(tmp_path, monkeypatch):
     monkeypatch.setenv("POISONLENS_DATA_DIR", str(tmp_path))
     assert ScanPaths(GOOD_ID).root == (tmp_path / "scans" / GOOD_ID).resolve()
