@@ -98,6 +98,23 @@ class Limits(_Strict):
     parse: ParseLimits = Field(default_factory=ParseLimits)
 
 
+# --------------------------------------------------------------------------- S1 inspect
+
+
+class InspectConfig(_Strict):
+    label_suggest_min_score: float = Field(
+        0.5, ge=0, le=1, description="provisional: pre-select a label column only at or above this score"
+    )
+    max_label_cardinality: int = Field(1000, ge=2, description="spec: class counts 2..1000 supported by the probe")
+    text_min_mean_length: float = Field(40.0, gt=0, description="provisional: string column treated as free text")
+    min_records_for_probe: int = Field(20, gt=0, description="provisional: below this the probe is disabled")
+    regression_min_unique: int = Field(
+        25, gt=2, description="provisional: numeric label with more distinct values is a regression target"
+    )
+    chunk_rows: int = Field(50_000, gt=0, description="provisional: rows per streamed chunk when loading")
+    image_verify_sample: int = Field(200, gt=0, description="provisional: images fully verified during inspect")
+
+
 # --------------------------------------------------------------------------- S2 security
 
 
@@ -285,6 +302,7 @@ class ScanConfig(_Strict):
     profile: ProfileName = Field("standard", description="spec: Quick / Standard (default) / Deep")
     seed: int = Field(42, description="provisional: base seed for everything not covered by probe.seeds")
     limits: Limits = Field(default_factory=Limits)
+    inspect: InspectConfig = Field(default_factory=InspectConfig)
     security: SecurityConfig = Field(default_factory=SecurityConfig)
     quality: QualityConfig = Field(default_factory=QualityConfig)
     features: FeatureConfig = Field(default_factory=FeatureConfig)

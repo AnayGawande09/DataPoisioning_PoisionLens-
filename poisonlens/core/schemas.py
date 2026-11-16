@@ -183,6 +183,30 @@ class Capabilities(_Model):
     reasons: dict[str, str] = Field(default_factory=dict)
 
 
+class ContainerInfo(_Model):
+    """Something the user can pick inside a file: a sheet, table, array, record element or member file."""
+
+    name: str
+    kind: str  # "sheet" | "table" | "view" | "array" | "element" | "file" | "key"
+    n_records: int | None = Field(default=None, ge=0)
+    shape: list[int] | None = None  # arrays
+    dtype: str | None = None  # arrays
+    state: str | None = None  # sheets: "visible" | "hidden" | "veryHidden"
+    selectable: bool = True  # False when the container cannot be loaded (e.g. object arrays, virtual tables)
+    note: str = ""
+
+
+class Selection(_Model):
+    """User choices that steer loading. ``None`` means "use the adapter's default"."""
+
+    member: str | None = None  # archive uploads: which extracted data file to read
+    container: str | None = None  # table / array (X) / JSON key / XML record element
+    sheets: list[str] | None = None  # spreadsheets: one or more sheets with a common header
+    label_column: str | None = None  # tabular/text label column, or the y array for arrays
+    text_column: str | None = None
+    y_array: str | None = None
+
+
 class DatasetProfile(_Model):
     format: str
     modality: Modality
@@ -193,6 +217,13 @@ class DatasetProfile(_Model):
     splits: SplitInfo | None = None
     class_hist: dict[str, int] = Field(default_factory=dict)
     capabilities: Capabilities
+    # Additions beyond the build plan's field list (see docs/MIGRATION_NOTES.md, Phase 3):
+    adapter: str = ""
+    containers: list[ContainerInfo] = Field(default_factory=list)
+    selection: Selection = Field(default_factory=Selection)  # defaults the UI pre-selects
+    text_column: str | None = None
+    sampled: bool = False  # True when columns/class_hist come from a sample (inspect), not a full pass (load)
+    warnings: list[str] = Field(default_factory=list)
 
 
 # --------------------------------------------------------------------------- scan state

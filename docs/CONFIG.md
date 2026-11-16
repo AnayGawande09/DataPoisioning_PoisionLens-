@@ -36,6 +36,13 @@ override the `probe.*` values listed in spec section 4.2. Unknown keys in any YA
 | `limits.parse.json_max_keys` | `2000` | provisional | JSON key-explosion cap |
 | `limits.parse.inspect_sample_rows` | `10000` | provisional | rows sampled for profiling |
 | `limits.parse.ram_budget_bytes` | `2147483648` | provisional | chunk sizing for streaming reads |
+| `inspect.label_suggest_min_score` | `0.5` | provisional | pre-select a label column only at or above this score |
+| `inspect.max_label_cardinality` | `1000` | spec | class counts 2..1000 supported by the probe |
+| `inspect.text_min_mean_length` | `40.0` | provisional | string column treated as free text |
+| `inspect.min_records_for_probe` | `20` | provisional | below this the probe is disabled |
+| `inspect.regression_min_unique` | `25` | provisional | numeric label with more distinct values is a regression target |
+| `inspect.chunk_rows` | `50000` | provisional | rows per streamed chunk when loading |
+| `inspect.image_verify_sample` | `200` | provisional | images fully verified during inspect |
 | `security.halt_on_critical_file` | `True` | spec | critical file-level findings halt parsing |
 | `security.halting_checks` | `['F03', 'F06', 'F07']` | spec | (build plan: checks that may halt |
 | `security.check_timeout_seconds` | `60.0` | provisional | per-check timeout |

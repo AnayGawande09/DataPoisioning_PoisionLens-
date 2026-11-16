@@ -18,12 +18,29 @@ dependencies = [
     "pyyaml",
     "pydantic>=2",
     "psutil>=5.9",
+    "pandas>=2.2",
+    # pyarrow 26.0.1 DLLs were blocked by Windows Smart App Control on the dev machine (new,
+    # low-reputation binaries); 23.0.1 loads. Revisit the upper bound later (docs/MIGRATION_NOTES.md).
+    "pyarrow>=17,<24",
+    "charset-normalizer>=3",
+    "defusedxml>=0.7",
+    "openpyxl>=3.1",
+    "xlrd>=2",
+    "odfpy>=1.4",
+    "pillow>=10",
     "pytest",
 ]
 
 [project.optional-dependencies]
-formats = ["py7zr>=0.20"]
-dev = ["ruff", "mypy", "types-PyYAML"]
+formats = [
+    "py7zr>=0.20",
+    "fastavro>=1.9",
+    # 1.3.8 blocked by Smart App Control on the dev machine; 1.3.7 loads.
+    "pyreadstat>=1.2,<1.3.8",
+    "h5py>=3.10",
+    "soundfile>=0.12",
+]
+dev = ["ruff", "mypy", "types-PyYAML", "xlwt"]  # xlwt only writes the .xls test fixture
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -51,4 +68,4 @@ python_version = "3.10"
 plugins = ["pydantic.mypy"]
 ignore_missing_imports = true
 warn_unused_ignores = true
-files = ["poisonlens/core", "poisonlens/ingest", "poisonlens/security", "poisonlens/audit/ledger.py", "backend"]
+files = ["poisonlens/core", "poisonlens/ingest", "poisonlens/adapters", "poisonlens/security", "poisonlens/audit/ledger.py", "backend"]

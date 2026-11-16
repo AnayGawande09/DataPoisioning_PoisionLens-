@@ -86,6 +86,55 @@ Gate 2 evidence (`tests/unit/test_ingest_*.py`, `tests/integration/test_ingest_f
 
 Full suite: **399 passed, 1 skipped** (symlink-escape test in `test_core_paths.py`, needs Windows Developer Mode).
 
+## Phase 3 — universal adapters (S1)
+
+Package `poisonlens/adapters/` (no v1 equivalent). Plan file → real file:
+
+| Plan | Real | Notes |
+| :--- | :--- | :--- |
+| `base.py` | `base.py` | `Source` (a file, or the extracted `sandbox/` directory), `DatasetAdapter` ABC (`can_handle`, `inspect`, `load`, `iter_chunks`), CDR writers, two-pass type inference. |
+| — | `table_base.py` | Shared inspect/load for every row-shaped format (one implementation of profiling + streaming CDR writes). |
+| — | `profile.py` | The plan's "profile logic" (task 4): column stats, label ranking, split/text detection, capabilities with reasons. |
+| — | `fileset.py`, `layouts.py` | Shared helpers for file-set / array-image datasets; class-folder and `labels.csv` manifest layouts. |
+| `registry.py` | `registry.py` | Ranks by `can_handle`, ties to higher `specificity`. Adds `ArchiveMemberAdapter`: an archive holding data files (e.g. `data.csv.gz`, a zip of CSVs) lists each as a container and delegates to that file's adapter. |
+| `tabular.py` | `tabular.py` | CSV/TSV/PSV/TXT; a `.txt` without delimiters becomes one text record per line. |
+| `spreadsheet.py`, `jsonfam.py`, `columnar.py`, `statpkg.py`, `arrays.py`, `database.py`, `xmlrec.py`, `image_set.py`, `audio_set.py`, `serialized.py` | same | As in the plan. |
+| `text_set.py` | `text_set.py` | Document folders + CoNLL. JSONL with a `text` field is handled by `jsonfam.py`. |
+| `mlnative.py` | `mlnative.py` | CIFAR **binary** batches, MNIST IDX, Hugging Face `datasets` directories. |
+| `hfdataset.py` | (in `mlnative.py`) | Small enough to live with the other ML-native readers. |
+| — | `jobs.py` | `inspect_job` / `load_job` for the isolated worker; `source_for_scan` refuses uploads that S0 rejected. |
+
+CDR on disk (`canonical/`): `manifest.parquet` (`record_id, source_file, sheet, row, offset, split, label_raw, label_idx, payload_ref`, plus **`width, height`** for images, an addition), `features_raw.parquet` for table / text-in-column data (all columns including the label column; the probe drops it in Phase 6), file payloads referenced as `sandbox/<path>` or `upload/<file>`, images that only exist inside arrays written once to **`canonical/array_images.npy`** (uint8 NHWC) and referenced as `array:<i>`, Hugging Face image bytes written to `canonical/payloads/`. `record_id` is `r` + a 9-digit ordinal.
+
+Schema additions (beyond the plan's field list):
+
+- `DatasetProfile`: `adapter`, `containers: list[ContainerInfo]` (sheets with hidden / very-hidden state, tables and views, arrays with shape and dtype, XML elements, JSON keys, archive files), `selection` (the defaults the UI pre-selects), `text_column`, `sampled`, `warnings`.
+- `Selection {member, container, sheets, label_column, text_column, y_array}`: the user's choices passed to `load`.
+- `ScanConfig.inspect` (all provisional): label pre-selection threshold 0.5, max 1000 classes, free-text mean length 40, at least 20 records for the probe, 25 distinct values = regression target, 50 000-row chunks, 200 images verified during inspect.
+
+Decisions worth knowing:
+
+- **Label pre-selection needs a label-like name** (`label`, `class`, `target`, `y`, ...) or an explicit user choice; structure alone (low cardinality, last column) scores below the threshold. That is what makes an unlabeled CSV come out as `labels=False` instead of guessing `city`.
+- **Type stability.** Row-shaped data is read twice: pass 1 infers one type per column over the whole file (int → float → string widening), pass 2 writes Parquet with that schema. It costs a second read and guarantees that a column going from `3` to `3.5` to `oops` mid-file never breaks the schema.
+- **Detection formats → image labels.** COCO / YOLO / VOC images get the class of their largest object; images without annotations are unlabeled records.
+- **CoNLL** loads as sentence records but is reported as unlabeled (token tags are not sentence labels).
+- **Pickle-format CIFAR** (`data_batch_1` without `.bin`) is a pickle, so it is scan-only like any pickle; the binary CIFAR release is supported.
+- **Not supported yet:** TFRecord (needs CRC32C framing; not in the Gate 3 fixture list). SAS `.sas7bdat` has a reader but no fixture (pyreadstat cannot write the format), so it is untested. MATLAB v7.3 loads as HDF5 without transposing (MATLAB stores arrays column-major).
+- **Two bugs found and fixed while testing:** pandas 3's new `str` dtype was not recognized as text (it broke boolean casting and dropped `mean_length` from profiles); `FeatureWriter` did not create `canonical/` itself.
+
+**Windows Smart App Control.** On first import the policy blocked new native DLLs from `pyarrow 26.0.1` (`pyarrow.parquet`, `.dataset`, `.orc`) and `pyreadstat 1.3.8`, consistently across retries (unlike the transient scikit-learn / h5py blocks, which cleared after one or two runs). The security setting was **not** changed. Older releases with established reputation load fine, so `pyarrow` is pinned `<24` (23.0.1 installed) and `pyreadstat` `<1.3.8` (1.3.7 installed) in `pyproject.toml`. pandas 3.1.1 works with pyarrow 23.
+
+Gate 3 evidence:
+
+- `tests/corpus/make_fixtures.py` builds 35 fixtures: CSV, TSV, CSV.GZ, unlabeled CSV, XLSX (2 visible sheets + 1 hidden), XLS, ODS, JSON (nested, records under a key), JSONL, Parquet, Feather, ORC, Avro, SAV (value labels), DTA, NPY, NPZ, HDF5, SQLite, XML, image folders as ZIP / TAR / TGZ / 7z, COCO, YOLO, VOC, a `labels.csv` manifest, an audio ZIP, a text corpus, CoNLL, CIFAR binary, MNIST IDX, a Hugging Face directory, and a pickle. `.venv\Scripts\python -m tests.corpus.make_fixtures <dir>` writes them out.
+- `tests/unit/test_adapters_corpus.py` runs the real S0 + S1 code for each: modality, record count, pre-selected label and top candidate, capabilities, and a loadable CDR (unique ids, label indices, exact class histogram, features or payload files). **No fixture was skipped** on the dev machine; a missing optional dependency skips with its reason (`pytest -rs`).
+- Pickle fixture: profile `probe=False`; `pickle.load`, `pickle.loads` and `pickle.Unpickler` are monkeypatched to raise and are never called; `load_job` refuses.
+- Unlabeled CSV: `labels=False`, with the reason shown to the user.
+- `tests/unit/test_adapters_safety.py`: the SQLite authorizer denies INSERT / DELETE / DROP / CREATE / ATTACH / PRAGMA / `load_extension` / any function except `count`, and the file is byte-identical afterwards; SQL injection through the table name is refused; XML entity bomb and XXE raise `UnsafeFileError(F09)`; JSON key-explosion and depth caps hold; an object `.npy` is listed but never unpickled; an image pixel bomb, a corrupt image and an SVG are skipped with warnings.
+- `tests/integration/test_inspect_flow.py`: S0 → inspect → load through the isolated worker; a user label override; a rejected (zip-slip) upload cannot be inspected.
+
+Full suite: **498 passed, 1 skipped**; ruff and mypy clean on `poisonlens/{core,ingest,adapters,security}`, `audit/ledger.py` and `backend`.
+
 ## Module map (keep / move / rewrite / delete)
 
 ### `poisonlens/`
