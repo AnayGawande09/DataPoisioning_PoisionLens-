@@ -1,7 +1,7 @@
 """FastAPI server for PoisonLens v2.
 
-The upload-first scan API (spec section 6) is built in Phase 10; until then
-only the health endpoint is served. See docs/MIGRATION_NOTES.md for the v1
+The upload-first scan API (spec section 6) is built in Phase 10; until then the
+health endpoint and the quick-demo routes (``backend/demo_api.py``) are served. See docs/MIGRATION_NOTES.md for the v1
 endpoints that were removed.
 """
 
@@ -12,6 +12,7 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.demo_api import router as demo_router
 from poisonlens import __version__
 
 app = FastAPI(
@@ -30,6 +31,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type", "X-API-Key", "Last-Event-ID"],
 )
+app.include_router(demo_router)  # quick demo: GET / serves the single-page UI
 
 
 @app.get("/api/health", summary="Service health")

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PoisonLens Demo</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #14171c; --muted: #5d6573; --line: #e3e6eb;
+  --accent: #3b5bdb; --accent-soft: #e8edff;
+  --crit: #b4232a; --high: #d9480f; --med: #b07d00; --low: #2f7d4f; --info: #5d6573;
+  --clean: #2f7d4f; --sus: #b07d00; --bad: #b4232a;
+  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0f1115; --panel: #171a21; --ink: #e8eaee; --muted: #9aa3b2; --line: #2a2f3a;
+    --accent: #7c95ff; --accent-soft: #1e2540; --crit: #ff6b6b; --high: #ff922b; --med: #fcc419;
+    --low: #69db7c; --info: #9aa3b2; --clean: #69db7c; --sus: #fcc419; --bad: #ff6b6b; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { padding: 28px 16px 8px; max-width: 1180px; margin: 0 auto; }
+h1 { margin: 0; font-size: 26px; letter-spacing: -0.01em; }
+h1 span { color: var(--accent); }
+.sub { color: var(--muted); margin: 4px 0 0; }
+main { max-width: 1180px; margin: 0 auto; padding: 8px 16px 64px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-top: 16px; }
+h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 12px; }
+.drop { display: block; border: 2px dashed var(--line); border-radius: 12px; padding: 28px; text-align: center; cursor: pointer; transition: .15s; }
+.drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop strong { display: block; font-size: 17px; }
+.drop small { color: var(--muted); }
+.samples { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 14px; }
+.sample { text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 10px;
+  padding: 12px; cursor: pointer; font: inherit; }
+.sample:hover { border-color: var(--accent); }
+.sample b { font-family: var(--mono); font-size: 13px; }
+.sample p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.sample a { font-size: 12px; color: var(--accent); }
+.stages { display: flex; flex-wrap: wrap; gap: 6px; }
+.stage { padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.stage.active { border-color: var(--accent); color: var(--accent); animation: pulse 1s infinite alternate; }
+.stage.done { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+@keyframes pulse { from { opacity: .55 } to { opacity: 1 } }
+.verdict { display: grid; grid-template-columns: 180px 1fr; gap: 22px; align-items: center; }
+@media (max-width: 640px) { .verdict { grid-template-columns: 1fr; } }
+.gauge { position: relative; width: 160px; height: 160px; }
+.gauge svg { transform: rotate(-90deg); }
+.gauge .num { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+.gauge .num b { font-size: 36px; display: block; line-height: 1; }
+.gauge .num span { color: var(--muted); font-size: 12px; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: 14px; color: #fff; }
+.v-clean { background: var(--clean); } .v-suspicious { background: var(--sus); color: #1b1b1b; }
+.v-likely_poisoned, .v-unsafe_file { background: var(--bad); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }
+.kpi { border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+.kpi b { display: block; font-size: 20px; }
+.kpi span { color: var(--muted); font-size: 12px; }
+.bars div { display: grid; grid-template-columns: 110px 1fr 44px; gap: 8px; align-items: center; font-size: 13px; margin: 4px 0; }
+.bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+.finding { border-left: 4px solid var(--info); padding: 8px 12px; margin: 8px 0; background: var(--bg); border-radius: 0 8px 8px 0; }
+.finding.critical { border-color: var(--crit); } .finding.high { border-color: var(--high); }
+.finding.medium { border-color: var(--med); } .finding.low { border-color: var(--low); }
+.finding .t { font-weight: 600; }
+.finding .m { color: var(--muted); font-size: 13px; }
+.sev { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-right: 6px; }
+.sev.critical { color: var(--crit); } .sev.high { color: var(--high); } .sev.medium { color: var(--med); }
+.sev.low { color: var(--low); } .sev.info { color: var(--info); }
+.tag { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-right: 4px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--panel); }
+.tablewrap { max-height: 480px; overflow: auto; }
+td.preview { font-family: var(--mono); font-size: 12px; color: var(--muted); max-width: 380px; word-break: break-word; }
+.tier { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.tier.quarantine { background: var(--bad); color: #fff; } .tier.downweight { background: var(--sus); color: #1b1b1b; }
+.downloads a { display: inline-block; margin: 4px 8px 4px 0; padding: 8px 12px; border-radius: 8px; background: var(--accent);
+  color: #fff; text-decoration: none; font-size: 14px; }
+.chain { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 12px; font-family: var(--mono); }
+.chain span { padding: 3px 7px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.chain i { color: var(--muted); font-style: normal; }
+.mono { font-family: var(--mono); font-size: 12px; word-break: break-all; }
+.muted { color: var(--muted); }
+.err { color: var(--bad); font-weight: 600; }
+.hidden { display: none; }
+.trig { font-family: var(--mono); background: var(--bg); border: 1px solid var(--line); padding: 8px 10px; border-radius: 8px; margin: 6px 0; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Poison<span>Lens</span> <small class="muted" style="font-size:14px;font-weight:400">quick demo</small></h1>
+  <p class="sub">Upload a training dataset. PoisonLens checks the file safely, finds poisoned and mislabeled records,
+    and gives you back a cleaned copy with a tamper-evident audit trail.</p>
+</header>
+<main>
+  <section class="card">
+    <h2>1 · Dataset</h2>
+    <label class="drop" id="drop">
+      <input type="file" id="file" hidden>
+      <strong>Drop a dataset here or click to choose</strong>
+      <small>CSV, Excel, JSON, Parquet, SQLite, NumPy, HDF5, image/text folders as ZIP … up to the configured limit</small>
+    </label>
+    <p class="muted" style="margin:14px 0 0">Or try a sample with planted problems:</p>
+    <div class="samples" id="samples"></div>
+  </section>
+
+  <section class="card hidden" id="progress">
+    <h2>2 · Scan</h2>
+    <div class="stages" id="stages"></div>
+    <p class="muted" id="status" style="margin:10px 0 0"></p>
+  </section>
+
+  <div id="result" class="hidden">
+    <section class="card">
+      <h2>3 · Verdict</h2>
+      <div class="verdict">
+        <div class="gauge" id="gauge"></div>
+        <div>
+          <span class="badge" id="verdict"></span>
+          <p id="summary" style="margin:10px 0 0"></p>
+          <div class="kpis" id="kpis"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Risk breakdown</h2>
+        <div class="bars" id="parts"></div>
+        <h2 style="margin-top:18px">Dataset</h2>
+        <div id="profile"></div>
+      </section>
+      <section class="card">
+        <h2>Backdoor triggers</h2>
+        <div id="triggers"></div>
+        <h2 style="margin-top:18px">Cleaning decision</h2>
+        <div class="bars" id="tiers"></div>
+        <div class="downloads" id="downloads" style="margin-top:12px"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Findings</h2>
+      <div id="findings"></div>
+    </section>
+
+    <section class="card">
+      <h2>Flagged records <small class="muted" id="flagcount"></small></h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Record</th><th>Action</th><th>Score</th><th>Label</th><th>Model says</th><th>Why</th><th>Content</th></tr></thead>
+        <tbody id="flagged"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card">
+      <h2>Audit ledger</h2>
+      <p id="ledgerinfo" style="margin:0 0 8px"></p>
+      <div class="chain" id="chain"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+"use strict";
+// Everything from the server is rendered with textContent: never as HTML.
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined && text !== null) e.textContent = String(text); return e; };
+const STAGES = [["upload","Upload"],["ingest","Safe ingest"],["inspect","Format & profile"],["security","Content security"],["quality","Quality & triggers"],["detect","Poison detection"],["sanitize","Clean & export"],["seal","Seal ledger"]];
+const VERDICT = { clean: "Clean", suspicious: "Suspicious", likely_poisoned: "Likely poisoned", unsafe_file: "Unsafe file" };
+let timer = null;
+
+function startProgress(name) {
+  $("progress").classList.remove("hidden"); $("result").classList.add("hidden");
+  const box = $("stages"); box.replaceChildren();
+  const nodes = STAGES.map(([, label]) => { const n = el("span", "stage", label); box.append(n); return n; });
+  let i = 0; nodes[0].classList.add("active");
+  $("status").textContent = "Scanning " + name + " …";
+  clearInterval(timer);
+  timer = setInterval(() => { if (i < nodes.length - 2) { nodes[i].classList.replace("active", "done"); i++; nodes[i].classList.add("active"); } }, 450);
+  return () => { clearInterval(timer); nodes.forEach(n => { n.classList.remove("active"); n.classList.add("done"); }); };
+}
+
+async function run(promise, name) {
+  const finish = startProgress(name);
+  try {
+    const res = await promise;
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.detail || res.statusText);
+    finish();
+    $("status").textContent = "Done in " + body.timings.total.toFixed(1) + " s · scan " + body.scan_id;
+    render(body);
+  } catch (e) {
+    clearInterval(timer);
+    $("status").replaceChildren(el("span", "err", "Scan failed: " + e.message));
+  }
+}
+
+function scanFile(f) {
+  const fd = new FormData(); fd.append("file", f);
+  run(fetch("/api/demo/scan", { method: "POST", body: fd }), f.name);
+}
+
+function gauge(score, verdict) {
+  const r = 70, c = 2 * Math.PI * r, color = getComputedStyle(document.documentElement).getPropertyValue(
+    verdict === "clean" ? "--clean" : verdict === "suspicious" ? "--sus" : "--bad");
+  const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("width", "160"); svg.setAttribute("height", "160");
+  for (const [stroke, dash] of [["var(--line)", c], [color, c * score / 100]]) {
+    const ci = document.createElementNS(ns, "circle");
+    ci.setAttribute("cx", "80"); ci.setAttribute("cy", "80"); ci.setAttribute("r", String(r));
+    ci.setAttribute("fill", "none"); ci.setAttribute("stroke", stroke); ci.setAttribute("stroke-width", "14");
+    ci.setAttribute("stroke-dasharray", dash + " " + c); ci.setAttribute("stroke-linecap", "round");
+    svg.append(ci);
+  }
+  const num = el("div", "num"); const inner = el("div");
+  inner.append(el("b", null, Math.round(score)), el("span", null, "risk / 100"));
+  num.append(inner);
+  $("gauge").replaceChildren(svg, num);
+}
+
+function bar(label, value, max, text) {
+  const row = el("div"); const b = el("div", "bar"); const i = el("i");
+  i.style.width = Math.max(0, Math.min(100, 100 * value / (max || 1))) + "%"; b.append(i);
+  row.append(el("span", null, label), b, el("span", "muted", text ?? value)); return row;
+}
+
+function kpi(value, label) { const k = el("div", "kpi"); k.append(el("b", null, value), el("span", null, label)); return k; }
+
+function render(r) {
+  $("result").classList.remove("hidden");
+  gauge(r.risk_score, r.verdict);
+  const v = $("verdict"); v.className = "badge v-" + r.verdict; v.textContent = VERDICT[r.verdict] || r.verdict;
+  const p = r.profile || {};
+  const flaggedN = (r.tiers.quarantine || 0) + (r.tiers.downweight || 0);
+  let summary;
+  if (r.error) summary = "The dataset could not be loaded: " + r.error;
+  else if (r.verdict === "unsafe_file") summary = "The file was rejected before parsing: " + ((r.ingest && r.ingest.halt_reason) || (r.findings[0] && r.findings[0].title) || "unsafe content") + ".";
+  else summary = (p.n_records ?? 0).toLocaleString() + " records scanned. About " + (100 * r.estimated_contamination).toFixed(1) +
+    "% look poisoned or mislabeled; " + (r.tiers.quarantine || 0) + " are quarantined and " + (r.tiers.downweight || 0) + " down-weighted in the cleaned copy.";
+  $("summary").textContent = summary;
+  const k = $("kpis"); k.replaceChildren(
+    kpi((p.n_records ?? 0).toLocaleString(), "records"),
+    kpi(r.findings.length, "findings"),
+    kpi(r.triggers.length, "trigger candidates"),
+    kpi(r.detector && r.detector.oof_accuracy != null ? (100 * r.detector.oof_accuracy).toFixed(1) + "%" : "–", "probe accuracy"),
+    kpi(flaggedN, "records flagged"));
+  if (r.planted_truth) k.append(kpi((r.planted_truth.flipped_rows ?? 0) + (r.planted_truth.backdoor_rows ?? 0) + (r.planted_truth.poisoned_files ?? 0), "actually planted"));
+
+  $("parts").replaceChildren(...Object.entries(r.risk_parts || {}).map(([n, x]) => bar(n, x, 50, x.toFixed(1))));
+  const prof = $("profile"); prof.replaceChildren();
+  if (r.profile) {
+    const t = el("table"); const rows = [["Format", p.format], ["Reader", p.adapter], ["Modality", p.modality], ["Label column", p.label_chosen || "none"],
+      ["Classes", Object.keys(p.class_hist || {}).length || "–"], ["Text column", p.text_column || "–"], ["Detector", r.detector ? r.detector.method : "skipped"]];
+    for (const [a, b] of rows) { const tr = el("tr"); tr.append(el("td", "muted", a), el("td", null, b)); t.append(tr); }
+    prof.append(t);
+  }
+  for (const n of (r.notes || [])) prof.append(el("p", "muted", n));
+
+  const tr = $("triggers"); tr.replaceChildren();
+  if (!r.triggers.length) tr.append(el("p", "muted", "No trigger candidates found."));
+  for (const t of r.triggers.slice(0, 6)) {
+    tr.append(el("div", "trig", (t.kind === "token" ? "word " : t.where + " = ") + "'" + t.value + "'  →  label '" + t.target_label +
+      "'  ·  " + t.support + " records, " + (100 * t.purity).toFixed(0) + "% pure"));
+  }
+  const total = Object.values(r.tiers).reduce((a, b) => a + b, 0);
+  $("tiers").replaceChildren(...[["keep", "keep (weight 1.0)"], ["downweight", "down-weight (0.2)"], ["quarantine", "quarantine (removed)"]]
+    .filter(([n]) => r.tiers[n] !== undefined).map(([n, l]) => bar(l, r.tiers[n], total, r.tiers[n])));
+  const dl = $("downloads"); dl.replaceChildren();
+  const names = { "cleaned.csv": "Cleaned dataset", "review.csv": "Flagged records", "report.json": "Report (JSON)", "ledger.jsonl": "Audit ledger" };
+  for (const n of r.downloads || []) { const a = el("a", null, names[n] || n); a.href = "/api/demo/scans/" + encodeURIComponent(r.scan_id) + "/download/" + encodeURIComponent(n); dl.append(a); }
+
+  const fs = $("findings"); fs.replaceChildren();
+  if (!r.findings.length) fs.append(el("p", "muted", "No security or quality findings."));
+  for (const f of r.findings) {
+    const d = el("div", "finding " + f.severity); const t = el("div", "t");
+    t.append(el("span", "sev " + f.severity, f.severity), el("span", "tag", f.check_id), document.createTextNode(f.title));
+    d.append(t);
+    if (f.detail) d.append(el("div", "m", f.detail));
+    const refs = [...(f.owasp_refs || []), ...(f.cwe || [])];
+    if (f.remediation || refs.length) d.append(el("div", "m", (f.remediation ? "Fix: " + f.remediation + "  " : "") + (refs.length ? "[" + refs.join(", ") + "]" : "")));
+    fs.append(d);
+  }
+
+  const tb = $("flagged"); tb.replaceChildren();
+  $("flagcount").textContent = r.flagged.length ? "(top " + r.flagged.length + " by score)" : "";
+  for (const f of r.flagged) {
+    const row = el("tr"); const tier = el("td"); tier.append(el("span", "tier " + f.tier, f.tier));
+    row.append(el("td", "mono", f.record_id), tier, el("td", null, f.score.toFixed(2)), el("td", null, f.label ?? "–"),
+      el("td", null, f.predicted ?? "–"), el("td", null, f.reasons.join("; ")), el("td", "preview", f.preview));
+    tb.append(row);
+  }
+  if (!r.flagged.length) { const row = el("tr"); const td = el("td", "muted", "Nothing flagged."); td.colSpan = 7; row.append(td); tb.append(row); }
+
+  const L = r.ledger || {};
+  $("ledgerinfo").replaceChildren(el("b", null, L.verified ? "✔ Hash chain verified" : "✘ Hash chain broken"),
+    el("span", "muted", "  ·  " + L.entries + " entries · head "), el("span", "mono", (L.head || "").slice(0, 16) + "…"));
+  const ch = $("chain"); ch.replaceChildren();
+  (L.types || []).forEach((t, i) => { if (i) ch.append(el("i", null, "→")); ch.append(el("span", null, t)); });
+}
+
+// wiring
+const drop = $("drop");
+$("file").addEventListener("change", (e) => { if (e.target.files[0]) scanFile(e.target.files[0]); e.target.value = ""; });
+["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (f) scanFile(f); });
+
+fetch("/api/demo/samples").then(r => r.json()).then(list => {
+  const box = $("samples");
+  for (const s of list) {
+    const b = el("button", "sample"); b.type = "button";
+    const dl = el("a", null, "download"); dl.href = "/api/demo/samples/" + encodeURIComponent(s.name);
+    dl.addEventListener("click", (e) => e.stopPropagation());
+    b.append(el("b", null, s.name), el("p", null, s.description), dl);
+    b.addEventListener("click", () => run(fetch("/api/demo/scan-sample/" + encodeURIComponent(s.name), { method: "POST" }), s.name));
+    box.append(b);
+  }
+});
+</script>
+</body>
+</html>

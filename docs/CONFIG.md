@@ -121,3 +121,18 @@ override the `probe.*` values listed in spec section 4.2. Unknown keys in any YA
 | `canary.relax_factor` | `0.5` | spec | halve Tier 3 / Tier 2 budgets |
 | `export.neutralize_formulas` | `False` | spec | optional F10 formula neutralization |
 | `export.strip_image_metadata` | `False` | spec | optional image metadata stripping |
+| `demo.max_records` | `20000` | provisional | records analysed by the demo detector |
+| `demo.cv_folds` | `5` | provisional | folds for out-of-fold label agreement |
+| `demo.image_side` | `16` | provisional | images downscaled to side x side |
+| `demo.pca_dims` | `64` | provisional | PCA dims for image / wide features |
+| `demo.text_hash_features` | `65536` | provisional | hashed TF-IDF width |
+| `demo.label_suspect_prob` | `0.5` | provisional | P(other label) to flag |
+| `demo.outlier_weight` | `0.25` | provisional | isolation-forest share |
+| `demo.risk_security_weight` | `0.3` | provisional | risk blend |
+| `demo.risk_contamination_weight` | `0.5` | provisional | risk blend |
+| `demo.risk_trigger_weight` | `0.2` | provisional | risk blend |
+| `demo.contamination_full_scale` | `0.1` | provisional | eps -> 100 pts |
+| `demo.trigger_min_lift` | `1.5` | provisional | purity / class prior for a trigger |
+| `demo.trigger_max_value_frac` | `0.2` | provisional | trigger values are rare |
+| `demo.findings_sample_size` | `5` | provisional | record ids quoted per finding |
+| `demo.trigger_continuous_repeat` | `5.0` | provisional | repeat factor vs median for numeric triggers |

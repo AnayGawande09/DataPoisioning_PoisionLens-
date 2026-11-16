@@ -298,6 +298,26 @@ class ExportConfig(_Strict):
 # --------------------------------------------------------------------------- root
 
 
+class DemoConfig(_Strict):
+    """Quick-demo pipeline (``poisonlens/demo``). Stands in for Phases 4-9 until they are built."""
+
+    max_records: int = Field(20_000, gt=0, description="provisional (demo): records analysed by the demo detector")
+    cv_folds: int = Field(5, ge=2, description="provisional (demo): folds for out-of-fold label agreement")
+    image_side: int = Field(16, ge=4, description="provisional (demo): images downscaled to side x side")
+    pca_dims: int = Field(64, gt=0, description="provisional (demo): PCA dims for image / wide features")
+    text_hash_features: int = Field(2**16, gt=0, description="provisional (demo): hashed TF-IDF width")
+    label_suspect_prob: float = Field(0.5, gt=0, lt=1, description="provisional (demo): P(other label) to flag")
+    outlier_weight: float = Field(0.25, ge=0, le=1, description="provisional (demo): isolation-forest share")
+    risk_security_weight: float = Field(0.30, ge=0, le=1, description="provisional (demo): risk blend")
+    risk_contamination_weight: float = Field(0.50, ge=0, le=1, description="provisional (demo): risk blend")
+    risk_trigger_weight: float = Field(0.20, ge=0, le=1, description="provisional (demo): risk blend")
+    contamination_full_scale: float = Field(0.10, gt=0, le=1, description="provisional (demo): eps -> 100 pts")
+    trigger_min_lift: float = Field(1.5, gt=1, description="provisional (demo): purity / class prior for a trigger")
+    trigger_max_value_frac: float = Field(0.20, gt=0, le=1, description="provisional (demo): trigger values are rare")
+    findings_sample_size: int = Field(5, gt=0, description="provisional (demo): record ids quoted per finding")
+    trigger_continuous_repeat: float = Field(5.0, gt=1, description="provisional (demo): repeat factor vs median for numeric triggers")
+
+
 class ScanConfig(_Strict):
     profile: ProfileName = Field("standard", description="spec: Quick / Standard (default) / Deep")
     seed: int = Field(42, description="provisional: base seed for everything not covered by probe.seeds")
@@ -312,6 +332,7 @@ class ScanConfig(_Strict):
     tiers: TierConfig = Field(default_factory=TierConfig)
     canary: CanaryConfig = Field(default_factory=CanaryConfig)
     export: ExportConfig = Field(default_factory=ExportConfig)
+    demo: DemoConfig = Field(default_factory=DemoConfig)
 
 
 # --------------------------------------------------------------------------- loading
