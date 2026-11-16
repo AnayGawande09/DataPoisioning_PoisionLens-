@@ -10,9 +10,6 @@ Upload a training dataset. PoisonLens checks that the file is safe to open, find
 **poisoned, mislabeled or backdoored**, and gives you back a **cleaned copy** with a
 **tamper-evident audit trail** of every decision.
 
-> **Status:** v2 rebuild on branch `v2-upload-first`. Phases 0–3 of the build plan are done (upload,
-> safe ingestion, any-format reading). A **quick demo** runs the whole flow end to end today, with
-> simplified stand-ins for the later stages. See [Roadmap](#roadmap).
 
 ---
 
