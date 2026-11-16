@@ -28,6 +28,9 @@ dependencies = [
     "xlrd>=2",
     "odfpy>=1.4",
     "pillow>=10",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
     "pytest",
 ]
 
@@ -40,7 +43,7 @@ formats = [
     "h5py>=3.10",
     "soundfile>=0.12",
 ]
-dev = ["ruff", "mypy", "types-PyYAML", "xlwt"]  # xlwt only writes the .xls test fixture
+dev = ["ruff", "mypy", "types-PyYAML", "xlwt", "httpx"]  # xlwt only writes the .xls test fixture
 
 [tool.setuptools.packages.find]
 where = ["."]
